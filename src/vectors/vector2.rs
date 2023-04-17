@@ -4,6 +4,7 @@ use crate::Vector3;
 use crate::{AddSubArithmetic, MulDivScalar, use_impl_ops, impl_add, impl_sub, impl_mul, impl_div};
 
 /// A 2D vector that holds an x-coordinate and y-coordinate
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, Copy)]
 pub struct Vector2 {
 	/// The x coordinate of the vector
@@ -15,24 +16,103 @@ pub struct Vector2 {
 // Constructors
 impl Vector2 {
 	/// Creates a new 2D vector
+	/// - **x**: The x coordinate of the vector
+	/// - **y**: The y coordinate of the vector
+	/// 
+	/// **Returns**: Returns a new 2D vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector2;
+	/// let vector = Vector2::new(1.2, 3.45);
+	/// assert_eq!(1.2, vector.x());
+	/// assert_eq!(3.45, vector.y());
+	/// ```
 	pub fn new(x: f32, y: f32) -> Self { Vector2 { x, y } }
 	
+	/// Creates a new 2D vector from a 3D vector
+	/// - **vector**: The 3D vector to convert from
+	/// 
+	/// **Returns**: Returns a converted 2D vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Vector2,Vector3};
+	/// let vector3 = Vector3::new(1.2, 3.45, 6.789);
+	/// let vector2 = Vector2::from_vector3(vector3);
+	/// assert_eq!(1.2, vector2.x());
+	/// assert_eq!(3.45, vector2.y());
+	/// ```
+	pub fn from_vector3(vector: Vector3) -> Self { Vector2::new(vector.x(), vector.y()) }
+	
 	/// Creates an empty 2D vector: (0, 0)
+	/// 
+	/// **Returns**: Returns an empty 2D vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector2;
+	/// let vector = Vector2::zero();
+	/// assert_eq!(0.0, vector.x());
+	/// assert_eq!(0.0, vector.y());
+	/// ```
 	pub fn zero() -> Self { Vector2 { x: 0.0, y: 0.0 } }
 	
 	/// Creates a 2D unit vector that's pointing to the left: (-1, 0)
+	/// 
+	/// **Returns**: Returns a 2D unit vector that's pointing to the left
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector2;
+	/// let vector = Vector2::left();
+	/// assert_eq!(-1.0, vector.x());
+	/// assert_eq!(0.0, vector.y());
+	/// ```
 	pub fn left() -> Self { Vector2 { x: -1.0, y: 0.0 } }
 	
 	/// Creates a 2D unit vector that's pointing to the right: (1, 0)
+	/// 
+	/// **Returns**: Returns a 2D unit vector that's pointing to the right
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector2;
+	/// let vector = Vector2::right();
+	/// assert_eq!(1.0, vector.x());
+	/// assert_eq!(0.0, vector.y());
+	/// ```
 	pub fn right() -> Self { Vector2 { x: 1.0, y: 0.0 } }
 	
 	/// Creates a 2D unit vector that's pointing up: (0, 1)
+	/// 
+	/// **Returns**: Returns a 2D unit vector that's pointing up
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector2;
+	/// let vector = Vector2::up();
+	/// assert_eq!(0.0, vector.x());
+	/// assert_eq!(1.0, vector.y());
+	/// ```
 	pub fn up() -> Self { Vector2 { x: 0.0, y: 1.0 } }
 	
 	/// Creates a 2D unit vector that's pointing down: (0, -1)
+	/// 
+	/// **Returns**: Returns a 2D unit vector that's pointing down
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector2;
+	/// let vector = Vector2::down();
+	/// assert_eq!(0.0, vector.x());
+	/// assert_eq!(-1.0, vector.y());
+	/// ```
 	pub fn down() -> Self { Vector2 { x: 0.0, y: -1.0 } }
 	
 	/// Creates a 2D vector that contains 1 in all it's components: (1, 1)
+	/// 
+	/// **Returns**: Returns a 2D vector that contains 1 in all it's components
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector2;
+	/// let vector = Vector2::one();
+	/// assert_eq!(1.0, vector.x());
+	/// assert_eq!(1.0, vector.y());
+	/// ```
 	pub fn one() -> Self { Vector2 { x: 1.0, y: 1.0 } }
 }
 
@@ -146,6 +226,24 @@ impl Vector2 {
 	/// ```
 	pub fn dot(self, rhs: Vector2) -> f32 {
 		self.x * rhs.x + self.y * rhs.y
+	}
+}
+
+// Conversions
+impl Vector2 {
+	pub fn to_vector3(self) -> Vector3 { Vector3::new(self.x, self.y, 0.0) }
+}
+
+impl From<Vector3> for Vector2 {
+	fn from(value: Vector3) -> Self { Vector2::from_vector3(value) }
+}
+
+// Equates
+impl Eq for Vector2 {}
+impl PartialEq for Vector2 {
+	fn eq(&self, other: &Self) -> bool {
+		Math::approx(self.x, other.x)
+		&& Math::approx(self.y, other.y)
 	}
 }
 
