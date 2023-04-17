@@ -1,13 +1,38 @@
 [package]
 name = "mathx"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
+license-file = "LICENSE"
+authors = ["Paul Casanova <pgonzbecer@gmail.com>"]
+description = "A mathematics library designed to work with no_std"
+repository = "https://github.com/Taco-Hell-Studios/mathx"
+homepage = "https://tacoheck.com/software/rust/mathx"
+keywords = [
+	"math",
+	"no_std",
+	"vector",
+	"quaternion",
+	"matrix",
+	"ray",
+	"plane",
+	"geometry"
+]
+categories = [
+	"data-structures",
+	"embedded",
+	"mathematics",
+	"no-std",
+	"no-std::no-alloc",
+	"science",
+]
 
 [features]
-default = ["no_std"]
+default = ["no_std", "serde"]
 # default = []
 no_std = []
+serde = ["dep:serde"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+serde = { version = "1.0.160", optional = true, features = ["derive"] }
