@@ -1,6 +1,9 @@
 
 use core::ops::Range;
 
+/// A "static" structure used to compute math functions. Since `f32` gets a lot of it's
+/// functions stripped away when using `no_std`, you can use this structure to regain
+/// those functions. It will also work the same even if you don't use it for `no_std`.
 pub struct Math;
 
 impl Math {
@@ -14,39 +17,18 @@ impl Math {
 
 #[cfg(feature = "no_std")]
 impl Math {
+	/// Finds if the two floating point numbers are approximately close to each other
+	/// - **a**: The first number to check with
+	/// - **b**: The second number to check with
+	/// 
+	/// **Returns**: Returns true if the two values are approximately close to each other
+	/// #### Examples
 	/// ```
 	/// # use mathx::Math;
-	/// # use mathx::assert_range;
-	/// let value = Math::sin(0.0);
-	/// assert_eq!(0.0, value);
-	/// let value = Math::sin(1.570796327);
-	/// assert_range!(1.0, value, 0.00001);
-	/// let value = Math::sin(3.141592653);
-	/// // TODO: Doesnt work lol
-	/// assert_range!(1.0, value, 0.00001);
-	/// let value = Math::sin(4.71238898);
-	/// assert_eq!(-1.0, value);
-	/// let value = Math::sin(6.283185306);
-	/// assert_eq!(0.0, value);
-	/// let value = Math::sin(0.785398163);
-	/// assert_eq!(0.707106781, value);
-	/// let value = Math::sin(1.0);
-	/// assert_eq!(0.841470985, value);
-	/// let value = Math::sin(-100.0);
-	/// assert_eq!(0.506365641, value);
+	/// assert!(Math::approx(1.20000001, 1.2));
 	/// ```
-	pub fn sin(value: f32) -> f32 {
-		let x3 = value * value * value;
-		let x5 = value * value * x3;
-		let x7 = value * value * x5;
-		let x9 = value * value * x7;
-		
-		return
-			value
-			- (x3 * 0.166666666666667)
-			+ (x5 * 0.008333333333333)
-			- (x7 * 0.000198412698413)
-			+ (x9 * 0.000002755731922);
+	pub fn approx(a: f32, b: f32) -> bool {
+		Math::abs(a - b) < 0.000001
 	}
 	
 	/// Gets the fractional part of the value, getting only a value between 0 and 1
@@ -202,7 +184,7 @@ impl Math {
 	/// let value = Math::min(-19.0, -19.1);
 	/// assert_eq!(-19.1, value);
 	/// ```
-	pub fn min(a: f32, b: f32) -> f32 { if a < b { a } else { b } }
+	pub fn min(a: f32, b: f32) -> f32 { a.min(b) }
 	
 	/// Gets the maximum value between the two values
 	/// - **a**: The first value to get the maximum value from
@@ -217,7 +199,7 @@ impl Math {
 	/// let value = Math::max(-19.0, -19.1);
 	/// assert_eq!(-19.0, value);
 	/// ```
-	pub fn max(a: f32, b: f32) -> f32 { if a < b { b } else { a } }
+	pub fn max(a: f32, b: f32) -> f32 { a.max(b) }
 	
 	/// Clamps the value between the min and max values
 	/// - **value**: The value to clamp with
@@ -237,11 +219,7 @@ impl Math {
 	/// let value = Math::clamp(0.18, -0.1, 0.1);
 	/// assert_eq!(0.1, value);
 	/// ```
-	pub fn clamp(value: f32, min: f32, max: f32) -> f32 {
-		if value < min { min }
-		else if value > max { max }
-		else { value }
-	}
+	pub fn clamp(value: f32, min: f32, max: f32) -> f32 { value.clamp(min, max) }
 	
 	/// Linearly interpolates between the first and second values
 	/// - **a**: The first value to start from
@@ -352,6 +330,20 @@ impl Math {
 
 #[cfg(not(feature = "no_std"))]
 impl Math {
+	/// Finds if the two floating point numbers are approximately close to each other
+	/// - **a**: The first number to check with
+	/// - **b**: The second number to check with
+	/// 
+	/// **Returns**: Returns true if the two values are approximately close to each other
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// assert!(Math::approx(1.20000001, 1.2));
+	/// ```
+	pub fn approx(a: f32, b: f32) -> bool {
+		Math::abs(a - b) < 0.000001
+	}
+	
 	/// Gets the fractional part of the value, getting only a value between 0 and 1
 	/// - **value**: The value to get the fraction from
 	/// 

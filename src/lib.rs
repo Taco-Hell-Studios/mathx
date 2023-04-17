@@ -2,7 +2,7 @@
 #![cfg_attr(feature = "no_std", no_std)]
 
 mod math;
-pub use math::*;
+pub use math::Math;
 
 mod arithmetic;
 pub(crate) use arithmetic::*;
