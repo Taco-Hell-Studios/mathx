@@ -1,7 +1,7 @@
 
+use crate::Math;
 use crate::Vector2;
 use crate::{AddSubArithmetic, MulDivScalar, use_impl_ops, impl_add, impl_sub, impl_mul, impl_div};
-use std::fmt::{Display, Formatter};
 
 /// A 2D vector that holds an x-coordinate, y-coordinate, and z-coordinate
 #[derive(Debug, Clone, Copy)]
@@ -47,7 +47,9 @@ impl Vector3 {
 // Properties
 impl Vector3 {
 	/// Gets the x coordinate of the vector
-	/// #### Example
+	/// 
+	/// **Returns**: Returns the x coordinate of the vector
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector3;
 	/// let a = Vector3::new(10.0, 20.0, 30.0);
@@ -56,7 +58,9 @@ impl Vector3 {
 	pub fn x(&self) -> f32 { self.x }
 	
 	/// Gets the y coordinate of the vector
-	/// #### Example
+	/// 
+	/// **Returns**: Returns the y coordinate of the vector
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector3;
 	/// let a = Vector3::new(10.0, 20.0, 30.0);
@@ -65,7 +69,9 @@ impl Vector3 {
 	pub fn y(&self) -> f32 { self.y }
 	
 	/// Gets the z coordinate of the vector
-	/// #### Example
+	/// 
+	/// **Returns**: Returns the z coordinate of the vector
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector3;
 	/// let a = Vector3::new(10.0, 20.0, 30.0);
@@ -75,7 +81,7 @@ impl Vector3 {
 	
 	/// Sets the x coordinate of the vector
 	/// - **value**: The value to set the x coordinate of the vector
-	/// #### Example
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector3;
 	/// let mut a = Vector3::left();
@@ -86,7 +92,7 @@ impl Vector3 {
 	
 	/// Sets the y coordinate of the vector
 	/// - **value**: The value to set the y coordinate of the vector
-	/// #### Example
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector3;
 	/// let mut a = Vector3::up();
@@ -97,7 +103,7 @@ impl Vector3 {
 	
 	/// Sets the z coordinate of the vector
 	/// - **value**: The value to set the z coordinate of the vector
-	/// #### Example
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector3;
 	/// let mut a = Vector3::forward();
@@ -107,16 +113,20 @@ impl Vector3 {
 	pub fn set_z(&mut self, value: f32) { self.z = value; }
 	
 	/// Gets the magnitude of the vector. This returns the length of the vector
-	/// #### Example
+	/// 
+	/// **Returns**: Returns the magnitude of the vector
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector3;
 	/// let a = Vector3::new(-1.0, 2.0, -2.0);
 	/// assert_eq!(3.0, a.magnitude());
 	/// ```
-	pub fn magnitude(&self) -> f32 { self.square_magnitude().sqrt() }
+	pub fn magnitude(&self) -> f32 { Math::sqrt(self.square_magnitude()) }
 	
 	/// Gets the magnitude squared, avoiding the use of a square root
-	/// #### Example
+	/// 
+	/// **Returns**: Returns the magnitude of the vector squared
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector3;
 	/// let a = Vector3::new(-1.0, 2.0, 2.0);
@@ -126,8 +136,9 @@ impl Vector3 {
 }
 
 // Display
-impl Display for Vector3 {
-	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+#[cfg(not(feature = "no_std"))]
+impl std::fmt::Display for Vector3 {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		f.write_str(&format!("({}, {}, {})", self.x, self.y, self.z))
 	}
 }

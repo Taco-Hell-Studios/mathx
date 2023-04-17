@@ -1,7 +1,7 @@
 
+use crate::Math;
 use crate::Vector3;
 use crate::{AddSubArithmetic, MulDivScalar, use_impl_ops, impl_add, impl_sub, impl_mul, impl_div};
-use std::fmt::{Display, Formatter};
 
 /// A 2D vector that holds an x-coordinate and y-coordinate
 #[derive(Debug, Clone, Copy)]
@@ -40,7 +40,9 @@ impl Vector2 {
 impl Vector2 {
 	// Getters
 	/// Gets the x coordinate of the vector
-	/// #### Example
+	/// 
+	/// **Returns**: Returns the x coordinate of the vector
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector2;
 	/// let a = Vector2::new(10.0, 20.0);
@@ -49,7 +51,9 @@ impl Vector2 {
 	pub fn x(&self) -> f32 { self.x }
 	
 	/// Gets the y coordinate of the vector
-	/// #### Example
+	/// 
+	/// **Returns**: Returns the y coordinate of the vector
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector2;
 	/// let a = Vector2::new(10.0, 20.0);
@@ -60,7 +64,7 @@ impl Vector2 {
 	// Setters
 	/// Sets the x coordinate of the vector
 	/// - **value**: The value to set the x coordinate of the vector
-	/// #### Example
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector2;
 	/// let mut a = Vector2::left();
@@ -71,7 +75,7 @@ impl Vector2 {
 	
 	/// Sets the y coordinate of the vector
 	/// - **value**: The value to set the y coordinate of the vector
-	/// #### Example
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector2;
 	/// let mut a = Vector2::up();
@@ -81,16 +85,20 @@ impl Vector2 {
 	pub fn set_y(&mut self, value: f32) { self.y = value; }
 	
 	/// Gets the magnitude of the vector. This returns the length of the vector
-	/// #### Example
+	/// 
+	/// **Returns**: Returns the magnitude of the vector
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector2;
 	/// let a = Vector2::new(-1.0, 2.0);
 	/// assert_eq!(2.236068, a.magnitude());
 	/// ```
-	pub fn magnitude(&self) -> f32 { self.square_magnitude().sqrt() }
+	pub fn magnitude(&self) -> f32 { Math::sqrt(self.square_magnitude()) }
 	
 	/// Gets the magnitude squared, avoiding the use of a square root
-	/// #### Example
+	/// 
+	/// **Returns**: Returns the magnitude of the vector squared
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector2;
 	/// let a = Vector2::new(-1.0, 2.0);
@@ -104,10 +112,12 @@ impl Vector2 {
 	/// Gets the dot product of between the two vectors.
 	/// It can be used to determine the angle between two vectors.
 	/// - **rhs**: The other vector to dot product with
+	/// 
+	/// **Returns**: Returns the dot product
 	/// #### Remarks
 	/// Using two unit vectors, the maximum range of numbers go from -1 to 1. It scales with
 	/// the magnitude of both vectors (multiplying them together `a.magnitude() * b.magnitude()`)
-	/// #### Example
+	/// #### Examples
 	/// ```
 	/// # use mathx::Vector2;
 	/// let a = Vector2::one();
@@ -140,8 +150,9 @@ impl Vector2 {
 }
 
 // Display
-impl Display for Vector2 {
-	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+#[cfg(not(feature = "no_std"))]
+impl std::fmt::Display for Vector2 {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		f.write_str(&format!("({}, {})", self.x, self.y))
 	}
 }

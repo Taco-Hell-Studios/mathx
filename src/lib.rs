@@ -1,4 +1,6 @@
 
+#![cfg_attr(feature = "no_std", no_std)]
+
 mod math;
 pub use math::*;
 
