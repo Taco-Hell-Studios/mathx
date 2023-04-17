@@ -22,7 +22,7 @@ pub trait MulDivScalar {
 #[macro_export]
 macro_rules! use_impl_ops {
 	() => {
-		use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
+		use core::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
 	};
 }
 
