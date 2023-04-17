@@ -11,4 +11,4 @@ mod vectors;
 pub use vectors::*;
 
 mod colors;
-pub use colors::*;
+pub use colors::Color;
