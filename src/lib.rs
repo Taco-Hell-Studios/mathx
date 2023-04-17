@@ -1,4 +1,7 @@
 
+mod math;
+pub use math::*;
+
 mod arithmetic;
 pub(crate) use arithmetic::*;
 
