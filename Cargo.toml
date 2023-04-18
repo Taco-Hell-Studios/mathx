@@ -27,8 +27,8 @@ categories = [
 ]
 
 [features]
-default = ["no_std", "serde"]
-# default = []
+# default = ["no_std"]
+default = []
 no_std = []
 serde = ["dep:serde"]
 
