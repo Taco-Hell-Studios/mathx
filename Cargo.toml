@@ -12,9 +12,6 @@ keywords = [
 	"no_std",
 	"vector",
 	"quaternion",
-	"matrix",
-	"ray",
-	"plane",
 	"geometry"
 ]
 categories = [
