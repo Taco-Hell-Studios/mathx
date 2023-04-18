@@ -20,7 +20,6 @@ categories = [
 	"mathematics",
 	"no-std",
 	"no-std::no-alloc",
-	"science",
 ]
 
 [features]
