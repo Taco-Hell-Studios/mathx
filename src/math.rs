@@ -615,9 +615,10 @@ impl Math {
 	pub fn sqrt(value: f32) -> f32 { value.sqrt() }
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! assert_range {
-	($expected:expr, $value:expr, $delta:expr) => {
-		if !($value - $expected < $delta || $expected - $value < $delta) { panic!(); }
+	($expected:expr, $value:expr) => {
+		if Math::approx($expected, $value) { panic!(); }
 	};
 }
