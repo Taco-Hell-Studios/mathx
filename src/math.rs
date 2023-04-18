@@ -17,6 +17,188 @@ impl Math {
 
 #[cfg(feature = "no_std")]
 impl Math {
+	/// Gets the power of the given number by the other given number, with the power being an `i32`
+	/// - **a**: The base number to power
+	/// - **b**: The number to power with
+	/// 
+	/// **Returns**: Returns the powered number
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// let value = Math::pow_i32(3.0, 5);
+	/// assert_eq!(243.0, value);
+	/// let value = Math::pow_i32(10.45, 3);
+	/// assert_eq!(1141.166125, value);
+	/// let value = Math::pow_i32(0.0, 0);
+	/// assert_eq!(1.0, value);
+	/// let value = Math::pow_i32(10.0, 0);
+	/// assert_eq!(1.0, value);
+	/// let value = Math::pow_i32(0.0, 2);
+	/// assert_eq!(0.0, value);
+	/// let value = Math::pow_i32(2.0, -3);
+	/// assert_eq!(0.125, value);
+	/// ```
+	pub fn pow_i32(a: f32, b: i32) -> f32 {
+		if b == 0 { return 1.0 }
+		
+		let mut result = a;
+		
+		for _ in 1..Math::abs_i32(b) {
+			result *= a;
+		}
+		
+		if b < 0 { 1.0 / result }
+		else { result }
+	}
+	
+	/// Computes the cos and sin of the angle
+	/// - **angle**: The angle to compute the sine and cosine with
+	/// 
+	/// **Returns**: Returns the sine and cosine (respectively) as a tuple
+	/// #### Remarks
+	/// If you need to compute both `cos` and `sin` of the same angle, this function is more
+	/// performant to produce both values than calling `cos` and `sin` separately
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range_tuple2};
+	/// let value = Math::sin_cos(0.0);
+	/// assert_range_tuple2!((0.0, 1.0), value);
+	/// let value = Math::sin_cos(Math::PI_OVER_2);
+	/// assert_range_tuple2!((1.0, 0.0), value);
+	/// let value = Math::sin_cos(Math::PI);
+	/// assert_range_tuple2!((0.0, -1.0), value);
+	/// let value = Math::sin_cos(Math::PI + Math::PI_OVER_2);
+	/// assert_range_tuple2!((-1.0, 0.0), value);
+	/// let value = Math::sin_cos(Math::TWO_PI);
+	/// assert_range_tuple2!((0.0, 1.0), value);
+	/// let value = Math::sin_cos(Math::PI_OVER_2 * 0.5);
+	/// assert_range_tuple2!((0.707106781, 0.707106781), value);
+	/// let value = Math::sin_cos(1.0);
+	/// assert_range_tuple2!((0.841470985, 0.540302306), value);
+	/// let value = Math::sin_cos(-100.0);
+	/// assert_range_tuple2!((0.506365641, 0.862318872), value);
+	/// ```
+	pub fn sin_cos(angle: f32) -> (f32, f32) { Math::cordic(angle) }
+	
+	/// Computes the sine of the given angle
+	/// - **angle**: The angle to compute sine with in radians
+	/// 
+	/// **Returns**: Returns a value from the computed sine
+	/// #### Remarks
+	/// If you need to compute both `cos` and `sin` of the same angle, use `sin_cos` instead as it's more
+	/// performant to produce both values than calling `cos` and `sin` separately
+	/// ##### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::sin(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sin(Math::PI_OVER_2);
+	/// assert_range!(1.0, value);
+	/// let value = Math::sin(Math::PI);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sin(Math::PI + Math::PI_OVER_2);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::sin(Math::TWO_PI);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sin(Math::PI_OVER_2 * 0.5);
+	/// assert_range!(0.707106781, value);
+	/// let value = Math::sin(1.0);
+	/// assert_range!(0.841470985, value);
+	/// let value = Math::sin(-100.0);
+	/// assert_range!(0.506365641, value);
+	/// ```
+	pub fn sin(angle: f32) -> f32 { Math::cordic(angle).0 }
+	
+	/// Computes the cos of the given angle
+	/// - **angle**: The angle to compute cosine with in radians
+	/// 
+	/// **Returns**: Returns a value from the computed cosine
+	/// #### Remarks
+	/// If you need to compute both `cos` and `sin` of the same angle, use `sin_cos` instead as it's more
+	/// performant to produce both values than calling `cos` and `sin` separately
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::cos(0.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::cos(Math::PI_OVER_2);
+	/// assert_range!(0.0, value);
+	/// let value = Math::cos(Math::PI);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::cos(Math::PI + Math::PI_OVER_2);
+	/// assert_range!(0.0, value);
+	/// let value = Math::cos(Math::TWO_PI);
+	/// assert_range!(1.0, value);
+	/// let value = Math::cos(Math::PI_OVER_2 * 0.5);
+	/// assert_range!(0.707106781, value);
+	/// let value = Math::cos(1.0);
+	/// assert_range!(0.540302306, value);
+	/// let value = Math::cos(-100.0);
+	/// assert_range!(0.862318872, value);
+	/// ```
+	pub fn cos(angle: f32) -> f32 { Math::cordic(angle).1 }
+	
+	/// Gets the pre-calculated arc tangent values for use in the cordic algorithm
+	/// - **index**: The index to get the pre-calculated value from
+	/// 
+	/// **Returns**: Returns the pre-calculated value for the arc tangent
+	pub(self) fn get_atan_for_cordic(index: i32) -> f32 {
+		match index {
+			0 => 0.7853982,
+			1 => 0.4636476,
+			2 => 0.24497867,
+			3 => 0.124354996,
+			4 => 0.06241881,
+			5 => 0.031239834,
+			6 => 0.015623729,
+			7 => 0.007812341,
+			8 => 0.0039062302,
+			9 => 0.0019531226,
+			10 => 0.0009765622,
+			11 => 0.00048828122,
+			12 => 0.00024414063,
+			13 => 0.00012207031,
+			14 => 0.000061035156,
+			15 => 0.000030517578,
+			_ => 0.0,
+		}
+	}
+	
+	/// Negates the tuple, multiplying both components by -1
+	/// - **tuple**: The tuple to negate
+	/// 
+	/// **Returns**: Returns the negated tuple
+	pub(self) fn negate_tuple(tuple: (f32, f32)) -> (f32, f32) { (-tuple.0, -tuple.1) }
+	
+	/// Performs the CORDIC algorithm used to retrieve the sine and cosine values
+	/// - **angle**: The angle to find the value for
+	/// 
+	/// **Returns**: Returns the results of sine and cosine (respectively) in tuple form
+	pub(self) fn cordic(angle: f32) -> (f32, f32) {
+		const ITERATIONS: i32 = 16;
+		
+		if angle < -Math::PI_OVER_2 || angle > Math::PI_OVER_2 {
+			return if angle < 0.0 { Math::negate_tuple(Math::cordic(angle + Math::PI)) }
+				else { Math::negate_tuple(Math::cordic(angle - Math::PI)) };
+		}
+		
+		let mut cos = 0.6072529_f32;
+		let mut sin = 0.0_f32;
+		let mut z = angle;
+		
+		for i in 0..ITERATIONS {
+			let di = if z <= 0.0 { -1.0 } else { 1.0 };
+			let new_cos = cos - (sin * di * Math::pow_i32(2.0, -i));
+			let new_sin = sin + (cos * di * Math::pow_i32(2.0, -i));
+			
+			cos = new_cos;
+			sin = new_sin;
+			z -= di * Math::get_atan_for_cordic(i);
+		}
+		
+		return (sin, cos);
+	}
+	
 	/// Finds if the two floating point numbers are approximately close to each other
 	/// - **a**: The first number to check with
 	/// - **b**: The second number to check with
@@ -29,6 +211,21 @@ impl Math {
 	/// ```
 	pub fn approx(a: f32, b: f32) -> bool {
 		Math::abs(a - b) < 0.000001
+	}
+	
+	/// Finds if the two floating point numbers are approximately close to each other, provided the epsilon
+	/// - **a**: The first number to check with
+	/// - **b**: The second number to check with
+	/// - **epsilon**: The epsilon (smallest possible difference between numbers) to check with
+	/// 
+	/// **Returns**: Returns true if the two values are approximately close to each other
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// assert!(Math::approx_epsilon(1.2001, 1.2, 0.001));
+	/// ```
+	pub fn approx_epsilon(a: f32, b: f32, epsilon: f32) -> bool {
+		Math::abs(a - b) < epsilon
 	}
 	
 	/// Gets the fractional part of the value, getting only a value between 0 and 1
@@ -277,6 +474,22 @@ impl Math {
 	/// ```
 	pub fn abs(value: f32) -> f32 { if value < 0.0 { -value } else { value } }
 	
+	/// Gets the absolute value of the number
+	/// - **value**: The number to get the absolute value from
+	/// 
+	/// **Returns**: Returns the absolute value of the number
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// let value = Math::abs_i32(10);
+	/// assert_eq!(10, value);
+	/// let value = Math::abs_i32(-10);
+	/// assert_eq!(10, value);
+	/// let value = Math::abs_i32(-0);
+	/// assert_eq!(0, value);
+	/// ```
+	pub fn abs_i32(value: i32) -> i32 { if value < 0 { -value } else { value } }
+	
 	/// Truncates the value of the floating point number
 	/// - **value**: The number to truncate
 	/// 
@@ -330,6 +543,127 @@ impl Math {
 
 #[cfg(not(feature = "no_std"))]
 impl Math {
+	/// Gets the power of the given number by the other given number, with the power being an `i32`
+	/// - **a**: The base number to power
+	/// - **b**: The number to power with
+	/// 
+	/// **Returns**: Returns the powered number
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// let value = Math::pow_i32(3.0, 5);
+	/// assert_eq!(243.0, value);
+	/// let value = Math::pow_i32(10.45, 3);
+	/// assert_eq!(1141.166125, value);
+	/// let value = Math::pow_i32(0.0, 0);
+	/// assert_eq!(1.0, value);
+	/// let value = Math::pow_i32(10.0, 0);
+	/// assert_eq!(1.0, value);
+	/// let value = Math::pow_i32(0.0, 2);
+	/// assert_eq!(0.0, value);
+	/// let value = Math::pow_i32(2.0, -3);
+	/// assert_eq!(0.125, value);
+	/// ```
+	pub fn pow_i32(a: f32, b: i32) -> f32 {
+		if b == 0 { return 1.0 }
+		
+		let mut result = a;
+		
+		for _ in 1..Math::abs_i32(b) {
+			result *= a;
+		}
+		
+		if b < 0 { 1.0 / result }
+		else { result }
+	}
+	
+	/// Computes the cos and sin of the angle
+	/// - **angle**: The angle to compute the sine and cosine with
+	/// 
+	/// **Returns**: Returns the sine and cosine (respectively) as a tuple
+	/// #### Remarks
+	/// If you need to compute both `cos` and `sin` of the same angle, this function is more
+	/// performant to produce both values than calling `cos` and `sin` separately
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range_tuple2};
+	/// let value = Math::sin_cos(0.0);
+	/// assert_range_tuple2!((0.0, 1.0), value);
+	/// let value = Math::sin_cos(Math::PI_OVER_2);
+	/// assert_range_tuple2!((1.0, 0.0), value);
+	/// let value = Math::sin_cos(Math::PI);
+	/// assert_range_tuple2!((0.0, -1.0), value);
+	/// let value = Math::sin_cos(Math::PI + Math::PI_OVER_2);
+	/// assert_range_tuple2!((-1.0, 0.0), value);
+	/// let value = Math::sin_cos(Math::TWO_PI);
+	/// assert_range_tuple2!((0.0, 1.0), value);
+	/// let value = Math::sin_cos(Math::PI_OVER_2 * 0.5);
+	/// assert_range_tuple2!((0.707106781, 0.707106781), value);
+	/// let value = Math::sin_cos(1.0);
+	/// assert_range_tuple2!((0.841470985, 0.540302306), value);
+	/// let value = Math::sin_cos(-100.0);
+	/// assert_range_tuple2!((0.506365641, 0.862318872), value);
+	/// ```
+	pub fn sin_cos(angle: f32) -> (f32, f32) { angle.sin_cos() }
+	
+	/// Computes the sine of the given angle
+	/// - **angle**: The angle to compute sine with in radians
+	/// 
+	/// **Returns**: Returns a value from the computed sine
+	/// #### Remarks
+	/// If you need to compute both `cos` and `sin` of the same angle, use `sin_cos` instead as it's more
+	/// performant to produce both values than calling `cos` and `sin` separately
+	/// ##### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::sin(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sin(Math::PI_OVER_2);
+	/// assert_range!(1.0, value);
+	/// let value = Math::sin(Math::PI);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sin(Math::PI + Math::PI_OVER_2);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::sin(Math::TWO_PI);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sin(Math::PI_OVER_2 * 0.5);
+	/// assert_range!(0.707106781, value);
+	/// let value = Math::sin(1.0);
+	/// assert_range!(0.841470985, value);
+	/// let value = Math::sin(-100.0);
+	/// assert_range!(0.506365641, value);
+	/// ```
+	pub fn sin(angle: f32) -> f32 { angle.sin() }
+	
+	/// Computes the cos of the given angle
+	/// - **angle**: The angle to compute cosine with in radians
+	/// 
+	/// **Returns**: Returns a value from the computed cosine
+	/// #### Remarks
+	/// If you need to compute both `cos` and `sin` of the same angle, use `sin_cos` instead as it's more
+	/// performant to produce both values than calling `cos` and `sin` separately
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::cos(0.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::cos(Math::PI_OVER_2);
+	/// assert_range!(0.0, value);
+	/// let value = Math::cos(Math::PI);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::cos(Math::PI + Math::PI_OVER_2);
+	/// assert_range!(0.0, value);
+	/// let value = Math::cos(Math::TWO_PI);
+	/// assert_range!(1.0, value);
+	/// let value = Math::cos(Math::PI_OVER_2 * 0.5);
+	/// assert_range!(0.707106781, value);
+	/// let value = Math::cos(1.0);
+	/// assert_range!(0.540302306, value);
+	/// let value = Math::cos(-100.0);
+	/// assert_range!(0.862318872, value);
+	/// ```
+	pub fn cos(angle: f32) -> f32 { angle.cos() }
+	
 	/// Finds if the two floating point numbers are approximately close to each other
 	/// - **a**: The first number to check with
 	/// - **b**: The second number to check with
@@ -341,7 +675,22 @@ impl Math {
 	/// assert!(Math::approx(1.20000001, 1.2));
 	/// ```
 	pub fn approx(a: f32, b: f32) -> bool {
-		Math::abs(a - b) < 0.000001
+		Math::approx_epsilon(a, b, 0.00001)
+	}
+	
+	/// Finds if the two floating point numbers are approximately close to each other, provided the epsilon
+	/// - **a**: The first number to check with
+	/// - **b**: The second number to check with
+	/// - **epsilon**: The epsilon (smallest possible difference between numbers) to check with
+	/// 
+	/// **Returns**: Returns true if the two values are approximately close to each other
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// assert!(Math::approx_epsilon(1.2001, 1.2, 0.001));
+	/// ```
+	pub fn approx_epsilon(a: f32, b: f32, epsilon: f32) -> bool {
+		Math::abs(a - b) < epsilon
 	}
 	
 	/// Gets the fractional part of the value, getting only a value between 0 and 1
@@ -578,6 +927,22 @@ impl Math {
 	/// ```
 	pub fn abs(value: f32) -> f32 { value.abs() }
 	
+	/// Gets the absolute value of the number
+	/// - **value**: The number to get the absolute value from
+	/// 
+	/// **Returns**: Returns the absolute value of the number
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// let value = Math::abs_i32(10);
+	/// assert_eq!(10, value);
+	/// let value = Math::abs_i32(-10);
+	/// assert_eq!(10, value);
+	/// let value = Math::abs_i32(-0);
+	/// assert_eq!(0, value);
+	/// ```
+	pub fn abs_i32(value: i32) -> i32 { value.abs() }
+	
 	/// Truncates the value of the floating point number
 	/// - **value**: The number to truncate
 	/// 
@@ -619,6 +984,14 @@ impl Math {
 #[macro_export]
 macro_rules! assert_range {
 	($expected:expr, $value:expr) => {
-		if Math::approx($expected, $value) { panic!(); }
+		if !Math::approx_epsilon($expected, $value, 0.0001) { panic!("\n\nleft: {:?}\nright: {:?}\n\n", $expected, $value); }
+	};
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! assert_range_tuple2 {
+	($expected:expr, $value:expr) => {
+		if !Math::approx_epsilon($expected.0, $value.0, 0.0001) || !Math::approx_epsilon($expected.1, $value.1, 0.0001) { panic!("\n\nleft: {:?}\nright: {:?}\n\n", $expected, $value); }
 	};
 }
