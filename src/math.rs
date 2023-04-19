@@ -616,6 +616,28 @@ impl Math {
 		else { result }
 	}
 	
+	/// Gets the tangent  of the angle
+	/// - **angle**: The angle to compute the tangent with
+	/// 
+	/// **Returns**: Returns the value from the computed sine
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::tan(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::tan(Math::PI);
+	/// assert_range!(0.0, value);
+	/// let value = Math::tan(Math::TWO_PI);
+	/// assert_range!(0.0, value);
+	/// let value = Math::tan(Math::PI_OVER_4);
+	/// assert_range!(1.0, value);
+	/// let value = Math::tan(1.0);
+	/// assert_range!(1.557407725, value);
+	/// let value = Math::tan(-100.0);
+	/// assert_range!(0.587213915, value);
+	/// ```
+	pub fn tan(angle: f32) -> f32 { angle.tan() }
+	
 	/// Computes the cos and sin of the angle
 	/// - **angle**: The angle to compute the sine and cosine with
 	/// 
