@@ -9,6 +9,7 @@ pub struct Math;
 impl Math {
 	pub const PI: f32 = 3.14159265359;
 	pub const PI_OVER_2: f32 = 1.570796326;
+	pub const PI_OVER_4: f32 = 0.785398163;
 	pub const TWO_PI: f32 = 6.28318530718;
 	pub const E: f32 = 2.71828182845;
 	pub const DEG_TO_RAD: f32 = Math::PI / 180.0;
@@ -51,6 +52,32 @@ impl Math {
 		else { result }
 	}
 	
+	/// Gets the tangent  of the angle
+	/// - **angle**: The angle to compute the tangent with
+	/// 
+	/// **Returns**: Returns the value from the computed sine
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::tan(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::tan(Math::PI);
+	/// assert_range!(0.0, value);
+	/// let value = Math::tan(Math::TWO_PI);
+	/// assert_range!(0.0, value);
+	/// let value = Math::tan(Math::PI_OVER_4);
+	/// assert_range!(1.0, value);
+	/// let value = Math::tan(1.0);
+	/// assert_range!(1.557407725, value);
+	/// let value = Math::tan(-100.0);
+	/// assert_range!(0.587213915, value);
+	/// ```
+	pub fn tan(angle: f32) -> f32 {
+		let (sin, cos) = Math::cordic(angle);
+		
+		sin / cos
+	}
+	
 	/// Computes the cos and sin of the angle
 	/// - **angle**: The angle to compute the sine and cosine with
 	/// 
@@ -71,7 +98,7 @@ impl Math {
 	/// assert_range_tuple2!((-1.0, 0.0), value);
 	/// let value = Math::sin_cos(Math::TWO_PI);
 	/// assert_range_tuple2!((0.0, 1.0), value);
-	/// let value = Math::sin_cos(Math::PI_OVER_2 * 0.5);
+	/// let value = Math::sin_cos(Math::PI_OVER_4);
 	/// assert_range_tuple2!((0.707106781, 0.707106781), value);
 	/// let value = Math::sin_cos(1.0);
 	/// assert_range_tuple2!((0.841470985, 0.540302306), value);
@@ -100,7 +127,7 @@ impl Math {
 	/// assert_range!(-1.0, value);
 	/// let value = Math::sin(Math::TWO_PI);
 	/// assert_range!(0.0, value);
-	/// let value = Math::sin(Math::PI_OVER_2 * 0.5);
+	/// let value = Math::sin(Math::PI_OVER_4);
 	/// assert_range!(0.707106781, value);
 	/// let value = Math::sin(1.0);
 	/// assert_range!(0.841470985, value);
@@ -129,7 +156,7 @@ impl Math {
 	/// assert_range!(0.0, value);
 	/// let value = Math::cos(Math::TWO_PI);
 	/// assert_range!(1.0, value);
-	/// let value = Math::cos(Math::PI_OVER_2 * 0.5);
+	/// let value = Math::cos(Math::PI_OVER_4);
 	/// assert_range!(0.707106781, value);
 	/// let value = Math::cos(1.0);
 	/// assert_range!(0.540302306, value);
@@ -160,6 +187,18 @@ impl Math {
 			13 => 0.00012207031,
 			14 => 0.000061035156,
 			15 => 0.000030517578,
+			16 => 0.00001525878906,
+			17 => 0.00000762939453,
+			18 => 0.00000381469727,
+			19 => 0.00000190734863,
+			20 => 0.00000095367432,
+			21 => 0.00000047683716,
+			22 => 0.00000023841858,
+			23 => 0.00000011920929,
+			24 => 0.00000005960464,
+			25 => 0.00000002980232,
+			26 => 0.00000001490116,
+			27 => 0.00000000745058,
 			_ => 0.0,
 		}
 	}
@@ -175,14 +214,14 @@ impl Math {
 	/// 
 	/// **Returns**: Returns the results of sine and cosine (respectively) in tuple form
 	pub(self) fn cordic(angle: f32) -> (f32, f32) {
-		const ITERATIONS: i32 = 16;
+		const ITERATIONS: i32 = 28;
 		
 		if angle < -Math::PI_OVER_2 || angle > Math::PI_OVER_2 {
 			return if angle < 0.0 { Math::negate_tuple(Math::cordic(angle + Math::PI)) }
 				else { Math::negate_tuple(Math::cordic(angle - Math::PI)) };
 		}
 		
-		let mut cos = 0.6072529_f32;
+		let mut cos = 0.60725293500888;
 		let mut sin = 0.0_f32;
 		let mut z = angle;
 		
@@ -597,7 +636,7 @@ impl Math {
 	/// assert_range_tuple2!((-1.0, 0.0), value);
 	/// let value = Math::sin_cos(Math::TWO_PI);
 	/// assert_range_tuple2!((0.0, 1.0), value);
-	/// let value = Math::sin_cos(Math::PI_OVER_2 * 0.5);
+	/// let value = Math::sin_cos(Math::PI_OVER_4);
 	/// assert_range_tuple2!((0.707106781, 0.707106781), value);
 	/// let value = Math::sin_cos(1.0);
 	/// assert_range_tuple2!((0.841470985, 0.540302306), value);
@@ -626,7 +665,7 @@ impl Math {
 	/// assert_range!(-1.0, value);
 	/// let value = Math::sin(Math::TWO_PI);
 	/// assert_range!(0.0, value);
-	/// let value = Math::sin(Math::PI_OVER_2 * 0.5);
+	/// let value = Math::sin(Math::PI_OVER_4);
 	/// assert_range!(0.707106781, value);
 	/// let value = Math::sin(1.0);
 	/// assert_range!(0.841470985, value);
@@ -655,7 +694,7 @@ impl Math {
 	/// assert_range!(0.0, value);
 	/// let value = Math::cos(Math::TWO_PI);
 	/// assert_range!(1.0, value);
-	/// let value = Math::cos(Math::PI_OVER_2 * 0.5);
+	/// let value = Math::cos(Math::PI_OVER_4);
 	/// assert_range!(0.707106781, value);
 	/// let value = Math::cos(1.0);
 	/// assert_range!(0.540302306, value);
