@@ -6,14 +6,15 @@ use core::ops::Range;
 /// those functions. It will also work the same even if you don't use it for `no_std`.
 pub struct Math;
 
+// Constants
 impl Math {
 	pub const PI: f32 = 3.14159265359;
 	pub const PI_OVER_2: f32 = 1.570796326;
 	pub const PI_OVER_4: f32 = 0.785398163;
 	pub const TWO_PI: f32 = 6.28318530718;
 	pub const E: f32 = 2.71828182845;
-	pub const DEG_TO_RAD: f32 = Math::PI / 180.0;
-	pub const RAD_TO_DEG: f32 = 180.0 / Math::PI;
+	pub const DEG_TO_RAD: f32 = 0.01745329251;
+	pub const RAD_TO_DEG: f32 = 57.2957795131;
 }
 
 // pub fn asin(value: f32) -> f32 { todo!() }
@@ -21,11 +22,6 @@ impl Math {
 // pub fn asin_acos(value: f32) -> f32 { todo!() }
 // pub fn atan(value: f32) -> f32 { todo!() }
 
-// pub fn csc(angle: f32) -> f32 { 1.0 / Math::sin(angle) }
-// pub fn sec(angle: f32) -> f32 { 1.0 / Math::cos(angle) }
-// pub fn cot(angle: f32) -> f32 { 1.0 / Math::tan(angle) }
-
-// TODO: Completed
 impl Math {
 	/// Gets the absolute value of the number
 	/// - **value**: The number to get the absolute value from
@@ -147,7 +143,7 @@ impl Math {
 	/// ```
 	pub fn clamp(value: f32, min: f32, max: f32) -> f32 { value.clamp(min, max) }
 	
-	/// Computes the cos of the given angle
+	/// Computes the cosine of the given angle in radians
 	/// - **angle**: The angle to compute cosine with in radians
 	/// 
 	/// **Returns**: Returns a value from the computed cosine
@@ -176,8 +172,77 @@ impl Math {
 	/// ```
 	pub fn cos(angle: f32) -> f32 { Math::sin_cos(angle).1 }
 	
-	/// Computes the cosecant of the given angle
-	/// - **angle**: The angle to compute the cosecant with
+	/// Computes the cosine of the given angle in degrees
+	/// - **angle**: The angle to compute cosine with in degrees
+	/// 
+	/// **Returns**: Returns a value from the computed cosine
+	/// #### Remarks
+	/// If you need to compute both `cos_deg` and `sin_deg` of the same angle, use `sin_cos_deg` instead as it's more
+	/// performant to produce both values than calling `cos_deg` and `sin_deg` separately
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::cos_deg(0.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::cos_deg(90.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::cos_deg(180.0);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::cos_deg(270.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::cos_deg(360.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::cos_deg(45.0);
+	/// assert_range!(0.707106781, value);
+	/// let value = Math::cos_deg(57.29577951);
+	/// assert_range!(0.540302306, value);
+	/// let value = Math::cos_deg(-5729.577951);
+	/// assert_range!(0.862318872, value);
+	/// ```
+	pub fn cos_deg(angle: f32) -> f32 { Math::cos(Math::DEG_TO_RAD * angle) }
+	
+	/// Computes the cotangent of the given angle in radians
+	/// - **angle**: The angle to compute the cotangent with in radians
+	/// 
+	/// **Returns**: Returns the computed cotangent value
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::cot(Math::PI_OVER_2);
+	/// assert_range!(0.0, value);
+	/// let value = Math::cot(Math::PI + Math::PI_OVER_2);
+	/// assert_range!(0.0, value);
+	/// let value = Math::cot(Math::PI_OVER_4);
+	/// assert_range!(1.0, value);
+	/// let value = Math::cot(1.0);
+	/// assert_range!(0.642092616, value);
+	/// let value = Math::cot(-100.0);
+	/// assert_range!(1.702956919, value);
+	/// ```
+	pub fn cot(angle: f32) -> f32 { 1.0 / Math::tan(angle) }
+	
+	/// Computes the cotangent of the given angle in degrees
+	/// - **angle**: The angle to compute the cotangent with in degrees
+	/// 
+	/// **Returns**: Returns the computed cotangent value
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::cot_deg(90.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::cot_deg(270.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::cot_deg(45.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::cot_deg(57.29577951);
+	/// assert_range!(0.642092616, value);
+	/// let value = Math::cot_deg(-5729.577951);
+	/// assert_range!(1.702956919, value);
+	/// ```
+	pub fn cot_deg(angle: f32) -> f32 { Math::cot(Math::DEG_TO_RAD * angle) }
+	
+	/// Computes the cosecant of the given angle in radians
+	/// - **angle**: The angle to compute the cosecant with in radians
 	/// 
 	/// **Returns**: Returns the computed cosecant value
 	/// #### Examples
@@ -195,6 +260,26 @@ impl Math {
 	/// assert_range!(1.974857531, value);
 	/// ```
 	pub fn csc(angle: f32) -> f32 { 1.0 / Math::sin(angle) }
+	
+	/// Computes the cosecant of the given angle in degrees
+	/// - **angle**: The angle to compute the cosecant with in degrees
+	/// 
+	/// **Returns**: Returns the computed cosecant value
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::csc_deg(90.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::csc_deg(270.0);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::csc_deg(45.0);
+	/// assert_range!(1.414213562, value);
+	/// let value = Math::csc_deg(57.29577951);
+	/// assert_range!(1.188395106, value);
+	/// let value = Math::csc_deg(-5729.577951);
+	/// assert_range!(1.974857531, value);
+	/// ```
+	pub fn csc_deg(angle: f32) -> f32 { Math::csc(Math::DEG_TO_RAD * angle) }
 	
 	/// Gets the largest integer number that is less than or equal to the given number
 	/// - **value**: The value to get the floor with
@@ -380,6 +465,50 @@ impl Math {
 		}
 	}
 	
+	/// Computes the secant of the given angle in radians
+	/// - **angle**: The given angle to compute the secant with in radians
+	/// 
+	/// **Returns**: Returns the computed secant value
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::sec(0.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::sec(Math::PI);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::sec(Math::TWO_PI);
+	/// assert_range!(1.0, value);
+	/// let value = Math::sec(Math::PI_OVER_4);
+	/// assert_range!(1.414213562, value);
+	/// let value = Math::sec(1.0);
+	/// assert_range!(1.850815718, value);
+	/// let value = Math::sec(-100.0);
+	/// assert_range!(1.159663823, value);
+	/// ```
+	pub fn sec(angle: f32) -> f32 { 1.0 / Math::cos(angle) }
+	
+	/// Computes the secant of the given angle in degrees
+	/// - **angle**: The given angle to compute the secant with in degrees
+	/// 
+	/// **Returns**: Returns the computed secant value
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::sec_deg(0.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::sec_deg(180.0);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::sec_deg(360.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::sec_deg(45.0);
+	/// assert_range!(1.414213562, value);
+	/// let value = Math::sec_deg(57.29577951);
+	/// assert_range!(1.850815718, value);
+	/// let value = Math::sec_deg(-5729.577951);
+	/// assert_range!(1.159663823, value);
+	/// ```
+	pub fn sec_deg(angle: f32) -> f32 { Math::sec(Math::DEG_TO_RAD * angle) }
+	
 	/// Gets the sign (positive or negative) of the given value
 	/// - **value**: The value to check the sign with
 	/// 
@@ -402,7 +531,7 @@ impl Math {
 		}
 	}
 	
-	/// Computes the sine of the given angle
+	/// Computes the sine of the given angle in radians
 	/// - **angle**: The angle to compute sine with in radians
 	/// 
 	/// **Returns**: Returns a value from the computed sine
@@ -431,8 +560,37 @@ impl Math {
 	/// ```
 	pub fn sin(angle: f32) -> f32 { Math::sin_cos(angle).0 }
 	
-	/// Computes the cos and sin of the angle
-	/// - **angle**: The angle to compute the sine and cosine with
+	/// Computes the sine of the given angle in degrees
+	/// - **angle**: The angle to compute sine with in degrees
+	/// 
+	/// **Returns**: Returns a value from the computed sine
+	/// #### Remarks
+	/// If you need to compute both `cos_deg` and `sin_deg` of the same angle, use `sin_cos_deg` instead as it's more
+	/// performant to produce both values than calling `cos_deg` and `sin_deg` separately
+	/// ##### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::sin_deg(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sin_deg(90.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::sin_deg(180.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sin_deg(270.0);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::sin_deg(360.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sin_deg(45.0);
+	/// assert_range!(0.707106781, value);
+	/// let value = Math::sin_deg(57.29577951);
+	/// assert_range!(0.841470985, value);
+	/// let value = Math::sin_deg(-5729.577951);
+	/// assert_range!(0.506365641, value);
+	/// ```
+	pub fn sin_deg(angle: f32) -> f32 { Math::sin(Math::DEG_TO_RAD * angle) }
+	
+	/// Computes the sine and cosine of the angle in radians
+	/// - **angle**: The angle to compute the sine and cosine with in radians
 	/// 
 	/// **Returns**: Returns the sine and cosine (respectively) as a tuple
 	/// #### Remarks
@@ -485,6 +643,35 @@ impl Math {
 			return (sin, cos);
 		}
 	}
+	
+	/// Computes the sine and cosine of the angle in degrees
+	/// - **angle**: The angle to compute the sine and cosine with in degrees
+	/// 
+	/// **Returns**: Returns the sine and cosine (respectively) as a tuple
+	/// #### Remarks
+	/// If you need to compute both `cos_deg` and `sin_deg` of the same angle, this function is more
+	/// performant to produce both values than calling `cos_deg` and `sin_deg` separately
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range_tuple2};
+	/// let value = Math::sin_cos_deg(0.0);
+	/// assert_range_tuple2!((0.0, 1.0), value);
+	/// let value = Math::sin_cos_deg(90.0);
+	/// assert_range_tuple2!((1.0, 0.0), value);
+	/// let value = Math::sin_cos_deg(180.0);
+	/// assert_range_tuple2!((0.0, -1.0), value);
+	/// let value = Math::sin_cos_deg(270.0);
+	/// assert_range_tuple2!((-1.0, 0.0), value);
+	/// let value = Math::sin_cos_deg(360.0);
+	/// assert_range_tuple2!((0.0, 1.0), value);
+	/// let value = Math::sin_cos_deg(45.0);
+	/// assert_range_tuple2!((0.707106781, 0.707106781), value);
+	/// let value = Math::sin_cos_deg(57.29577951);
+	/// assert_range_tuple2!((0.841470985, 0.540302306), value);
+	/// let value = Math::sin_cos_deg(-5729.577951);
+	/// assert_range_tuple2!((0.506365641, 0.862318872), value);
+	/// ```
+	pub fn sin_cos_deg(angle: f32) -> (f32, f32) { Math::sin_cos(Math::DEG_TO_RAD * angle) }
 	
 	/// Computes a smooth Hermite interpolation that returns a number between 0.0 and 1.0
 	/// - **value**: The value for the interpolation, where `left_edge` &lt; `value` &lt; `right_edge`
@@ -544,10 +731,11 @@ impl Math {
 			return x;
 		}
 	}
-	/// Gets the tangent  of the angle
-	/// - **angle**: The angle to compute the tangent with
+	
+	/// Gets the tangent  of the angle in radians
+	/// - **angle**: The angle to compute the tangent with in radians
 	/// 
-	/// **Returns**: Returns the value from the computed sine
+	/// **Returns**: Returns the value from the computed tangent
 	/// #### Examples
 	/// ```
 	/// # use mathx::{Math,assert_range};
@@ -572,6 +760,28 @@ impl Math {
 			sin / cos
 		}
 	}
+	
+	/// Gets the tangent  of the angle in degrees
+	/// - **angle**: The angle to compute the tangent with in degrees
+	/// 
+	/// **Returns**: Returns the value from the computed tangent
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::tan_deg(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::tan_deg(180.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::tan_deg(360.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::tan_deg(45.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::tan_deg(57.29577951);
+	/// assert_range!(1.557407725, value);
+	/// let value = Math::tan_deg(-5729.577951);
+	/// assert_range!(0.587213915, value);
+	/// ```
+	pub fn tan_deg(angle: f32) -> f32 { Math::tan(Math::DEG_TO_RAD * angle) }
 	
 	/// Truncates the value of the floating point number
 	/// - **value**: The number to truncate
