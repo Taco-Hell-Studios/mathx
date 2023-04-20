@@ -94,6 +94,50 @@ impl Math {
 		Math::abs(a - b) < epsilon
 	}
 	
+	/// Computes the arc cosine (a.k.a inverse cosine) with the provided value
+	/// - **value**: The value to compute the arc cosine with, must be within -1 and 1
+	/// 
+	/// **Returns**: Returns the angle at which the value exists in radians,
+	/// returns `NaN` if the value provided is less than -1 or greater than 1
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::acos(0.0);
+	/// assert_range!(Math::PI_OVER_2, value);
+	/// let value = Math::acos(1.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::acos(-1.0);
+	/// assert_range!(Math::PI, value);
+	/// let value = Math::acos(0.707106781);
+	/// assert_range!(Math::PI_OVER_4, value);
+	/// let value = Math::acos(0.540302306);
+	/// assert_range!(1.0, value);
+	/// let value = Math::acos(2.0);
+	/// assert!(value.is_nan());
+	/// let value = Math::acos(-1.001);
+	/// assert!(value.is_nan());
+	/// ```
+	pub fn acos(x: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { x.acos() }
+		#[cfg(feature = "no_std")] {
+			if x < -1.0 || x > 1.0 { return f32::NAN; }
+			let negate = if x <= -0.0 { 1.0 } else { 0.0 };
+			let x = Math::abs(x);
+			let mut angle = -0.0187293;
+			
+			angle *= x;
+			angle += 0.0742610;
+			angle *= x;
+			angle -= 0.2121144;
+			angle *= x;
+			angle += Math::PI_OVER_2;
+			angle *= Math::sqrt(1.0 - x);
+			angle -= 2.0 * negate * angle;
+			
+			return negate * Math::PI + angle;
+		}
+	}
+	
 	/// Gets the smallest integer number that is greater than or equal to the given number
 	/// - **value**: The value to get the ceiling with
 	/// 
