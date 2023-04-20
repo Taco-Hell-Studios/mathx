@@ -176,6 +176,26 @@ impl Math {
 	/// ```
 	pub fn cos(angle: f32) -> f32 { Math::sin_cos(angle).1 }
 	
+	/// Computes the cosecant of the given angle
+	/// - **angle**: The angle to compute the cosecant with
+	/// 
+	/// **Returns**: Returns the computed cosecant value
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::csc(Math::PI_OVER_2);
+	/// assert_range!(1.0, value);
+	/// let value = Math::csc(Math::PI + Math::PI_OVER_2);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::csc(Math::PI_OVER_4);
+	/// assert_range!(1.414213562, value);
+	/// let value = Math::csc(1.0);
+	/// assert_range!(1.188395106, value);
+	/// let value = Math::csc(-100.0);
+	/// assert_range!(1.974857531, value);
+	/// ```
+	pub fn csc(angle: f32) -> f32 { 1.0 / Math::sin(angle) }
+	
 	/// Gets the largest integer number that is less than or equal to the given number
 	/// - **value**: The value to get the floor with
 	/// 
