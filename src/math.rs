@@ -703,15 +703,17 @@ impl Math {
 	/// **Returns**: Returns the square root of the number, returns NaN if `value` is negative
 	/// #### Examples
 	/// ```
-	/// # use mathx::Math;
+	/// # use mathx::{Math,assert_range};
 	/// let value = Math::sqrt(16.0);
-	/// assert_eq!(4.0, value);
+	/// assert_range!(4.0, value);
 	/// let value = Math::sqrt(1023.835);
-	/// assert_eq!(31.9974217711, value);
+	/// assert_range!(31.9974217711, value);
 	/// let value = Math::sqrt(-102.0);
 	/// assert_eq!(true, f32::is_nan(value));
 	/// let value = Math::sqrt(-0.0);
-	/// assert_eq!(0.0, value);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sqrt(0.2146018);
+	/// assert_range!(0.46325132, value);
 	/// ```
 	pub fn sqrt(value: f32) -> f32 {
 		#[cfg(not(feature = "no_std"))] { value.sqrt() }
@@ -722,9 +724,8 @@ impl Math {
 			let mut max = 50;
 			let mut x = value;
 			
-			while max > 0 && (value - x * x) <= 0.000001 {
-				x = (x + value / x) / 2.0;
-				if value - x * x == 0.0 { break; }
+			while max > 0 && Math::abs(x) > 0.000000001 {
+				x = (x * x * x + 3.0 * value * x) / (3.0 * x * x + value);
 				max -= 1;
 			}
 			
