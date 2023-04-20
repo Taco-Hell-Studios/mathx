@@ -1,6 +1,6 @@
 
 #[doc(hidden)]
-pub trait AddSubArithmetic<T> {
+pub(crate) trait AddSubArithmetic<T> {
 	type Output;
 	fn add_other(self, rhs: T) -> Self::Output;
 	fn subtract_other(self, rhs: T) -> Self::Output;
@@ -9,7 +9,7 @@ pub trait AddSubArithmetic<T> {
 }
 
 #[doc(hidden)]
-pub trait MulDivScalar {
+pub(crate) trait MulDivScalar {
 	type Output;
 	fn multiply_scalar(self, rhs: f32) -> Self::Output;
 	fn divide_scalar(self, rhs: f32) -> Self::Output;
@@ -19,15 +19,14 @@ pub trait MulDivScalar {
 }
 
 #[doc(hidden)]
-#[macro_export]
 macro_rules! use_impl_ops {
 	() => {
 		use core::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
 	};
 }
+pub(crate) use use_impl_ops;
 
 #[doc(hidden)]
-#[macro_export]
 macro_rules! impl_add {
 	($($t:ty)*) => {
 		$(
@@ -61,9 +60,9 @@ macro_rules! impl_add {
 		)*
 	};
 }
+pub(crate) use impl_add;
 
 #[doc(hidden)]
-#[macro_export]
 macro_rules! impl_sub {
 	($($t:ty)*) => {
 		$(
@@ -97,9 +96,9 @@ macro_rules! impl_sub {
 		)*
 	};
 }
+pub(crate) use impl_sub;
 
 #[doc(hidden)]
-#[macro_export]
 macro_rules! impl_mul {
 	($($t:ty)*) => {
 		$(
@@ -140,9 +139,9 @@ macro_rules! impl_mul {
 		)*
 	};
 }
+pub(crate) use impl_mul;
 
 #[doc(hidden)]
-#[macro_export]
 macro_rules! impl_div {
 	($($t:ty)*) => {
 		$(
@@ -183,3 +182,4 @@ macro_rules! impl_div {
 		)*
 	};
 }
+pub(crate) use impl_div;
