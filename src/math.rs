@@ -687,6 +687,21 @@ impl Math {
 	/// ```
 	pub fn min(a: f32, b: f32) -> f32 { a.min(b) }
 	
+	/// Gets the minimum and maximum value returned as a tuple correctly sorted
+	/// - **a**: The first value to get the minimum and maximum value from
+	/// - **b**: The second value to get the minimum and maximum value from
+	/// 
+	/// **Returns**: Returns a tuple that holds the minimum and maximum values respectively
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// let value = Math::min_max(-1.0, 1.0);
+	/// assert_eq!((-1.0, 1.0), value);
+	/// let value = Math::min_max(-19.0, -19.1);
+	/// assert_eq!((-19.1, -19.0), value);
+	/// ```
+	pub fn min_max(a: f32, b: f32) -> (f32, f32) { (Math::min(a, b), Math::max(a, b)) }
+	
 	/// Gets the power of the given number by the other given number, with the power being an `i32`
 	/// - **a**: The base number to power
 	/// - **b**: The number to power with
