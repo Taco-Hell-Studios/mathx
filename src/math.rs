@@ -17,11 +17,6 @@ impl Math {
 	pub const RAD_TO_DEG: f32 = 57.2957795131;
 }
 
-// pub fn asin(value: f32) -> f32 { todo!() }
-// pub fn acos(value: f32) -> f32 { todo!() }
-// pub fn asin_acos(value: f32) -> f32 { todo!() }
-// pub fn atan(value: f32) -> f32 { todo!() }
-
 impl Math {
 	/// Gets the absolute value of the number
 	/// - **value**: The number to get the absolute value from
@@ -94,7 +89,7 @@ impl Math {
 		Math::abs(a - b) < epsilon
 	}
 	
-	/// Computes the arc cosine (a.k.a inverse cosine) with the provided value
+	/// Computes the arc cosine (a.k.a. inverse cosine) with the provided value
 	/// - **value**: The value to compute the arc cosine with, must be within -1 and 1
 	/// 
 	/// **Returns**: Returns the angle at which the value exists in radians,
@@ -117,24 +112,146 @@ impl Math {
 	/// let value = Math::acos(-1.001);
 	/// assert!(value.is_nan());
 	/// ```
-	pub fn acos(x: f32) -> f32 {
-		#[cfg(not(feature = "no_std"))] { x.acos() }
+	pub fn acos(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.acos() }
 		#[cfg(feature = "no_std")] {
-			if x < -1.0 || x > 1.0 { return f32::NAN; }
-			let negate = if x <= -0.0 { 1.0 } else { 0.0 };
-			let x = Math::abs(x);
+			if value < -1.0 || value > 1.0 { return f32::NAN; }
+			
+			let negate = if value <= -0.0 { 1.0 } else { 0.0 };
+			let value = Math::abs(value);
 			let mut angle = -0.0187293;
 			
-			angle *= x;
+			angle *= value;
 			angle += 0.0742610;
-			angle *= x;
+			angle *= value;
 			angle -= 0.2121144;
-			angle *= x;
+			angle *= value;
 			angle += Math::PI_OVER_2;
-			angle *= Math::sqrt(1.0 - x);
+			angle *= Math::sqrt(1.0 - value);
 			angle -= 2.0 * negate * angle;
 			
 			return negate * Math::PI + angle;
+		}
+	}
+	
+	/// Computes the arc sine (a.k.a. inverse sine) with the provided value
+	/// - **value**: The value to compute the arc sine with, must be within -1 and 1
+	/// 
+	/// **Returns**: Returns the angle at which the value exists in radians,
+	/// returns `NaN` if the value provided is less than -1 or greater than 1
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::asin(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::asin(1.0);
+	/// assert_range!(Math::PI_OVER_2, value);
+	/// let value = Math::asin(-1.0);
+	/// assert_range!(-Math::PI_OVER_2, value);
+	/// let value = Math::asin(0.707106781);
+	/// assert_range!(Math::PI_OVER_4, value);
+	/// let value = Math::asin(-1.1);
+	/// assert!(value.is_nan());
+	/// let value = Math::asin(2.0);
+	/// assert!(value.is_nan());
+	/// let value = Math::asin(0.9999);
+	/// assert_range!(1.5566529, value);
+	/// let value = Math::asin(-0.25);
+	/// assert_range!(-0.25268024, value);
+	/// ```
+	pub fn asin(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.asin() }
+		#[cfg(feature = "no_std")] {
+			if value < -1.0 || value > 1.0 { return f32::NAN; }
+			
+			let negate = if value < 0.0 { 1.0 } else { 0.0 };
+			let value = Math::abs(value);
+			let mut angle = -0.0187293;
+			
+			angle *= value;
+			angle += 0.0742610;
+			angle *= value;
+			angle -= 0.2121144;
+			angle *= value;
+			angle += Math::PI_OVER_2;
+			angle = Math::PI * 0.5 - Math::sqrt(1.0 - value) * angle;
+			
+			return angle - 2.0 * negate * angle;
+		}
+	}
+	
+	/// Computes the arc tangent (a.k.a. inverse tangent) with the provided value
+	/// - **value**: The value to compute the arc tangent with
+	/// 
+	/// **Returns**: Returns the angle at which the value exists in radians
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::atan(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::atan(1.0);
+	/// assert_range!(Math::PI_OVER_4, value);
+	/// let value = Math::atan(-1.0);
+	/// assert_range!(-Math::PI_OVER_4, value);
+	/// let value = Math::atan(0.707106781);
+	/// assert_range!(0.615479708546, value);
+	/// let value = Math::atan(1.557407725);
+	/// assert_range!(1.0, value);
+	/// ```
+	pub fn atan(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.atan() }
+		#[cfg(feature = "no_std")] {
+			Math::atan2(value, 1.0)
+		}
+	}
+	
+	/// Computes the arc tangent (a.k.a. inverse tangent) with the provided x and y values
+	/// - **y**: The y value to compute the arc tangent with
+	/// - **x**: The x value to compute the arc tangent with
+	/// 
+	/// **Returns**: Returns the angle at with the two values divided exists in radians
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::atan2(0.0, 1.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::atan2(1.0, 1.0);
+	/// assert_range!(Math::PI_OVER_4, value);
+	/// let value = Math::atan2(-1.0, 1.0);
+	/// assert_range!(-Math::PI_OVER_4, value);
+	/// let value = Math::atan2(5.0, 1.0);
+	/// assert_range!(1.3734008, value);
+	/// let value = Math::atan2(1.0, 5.0);
+	/// assert_range!(0.19739556, value);
+	/// let value = Math::atan2(-5.0, 1.0);
+	/// assert_range!(-1.3734008, value);
+	/// let value = Math::atan2(-1.0, 5.0);
+	/// assert_range!(-0.19739556, value);
+	/// ```
+	pub fn atan2(y: f32, x: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { y.atan2(x) }
+		#[cfg(feature = "no_std")] {
+			let mut a = Math::abs(x);
+			let mut b = Math::abs(y);
+			let mut c = Math::max(a, b);
+			b = Math::min(a, b);
+			a = c.recip();
+			a = b * a;
+		  
+			let d = a * a;
+			c = -0.013480470;
+			c = c * d + 0.057477314;
+			c = c * d - 0.121239071;
+			c = c * d + 0.195635925;
+			c = c * d - 0.332994597;
+			c = c * d + 0.999995630;
+			a *= c;
+			
+			if Math::abs(y) > Math::abs(x) { a = Math::PI_OVER_2 - a; }
+			if x < 0.0 { a = Math::PI - a; }
+			if y < 0.0 { a *= -1.0; }
+			
+			return a;
 		}
 	}
 	
@@ -263,7 +380,7 @@ impl Math {
 	/// let value = Math::cot(-100.0);
 	/// assert_range!(1.702956919, value);
 	/// ```
-	pub fn cot(angle: f32) -> f32 { 1.0 / Math::tan(angle) }
+	pub fn cot(angle: f32) -> f32 { Math::tan(angle).recip() }
 	
 	/// Computes the cotangent of the given angle in degrees
 	/// - **angle**: The angle to compute the cotangent with in degrees
@@ -303,7 +420,7 @@ impl Math {
 	/// let value = Math::csc(-100.0);
 	/// assert_range!(1.974857531, value);
 	/// ```
-	pub fn csc(angle: f32) -> f32 { 1.0 / Math::sin(angle) }
+	pub fn csc(angle: f32) -> f32 { Math::sin(angle).recip() }
 	
 	/// Computes the cosecant of the given angle in degrees
 	/// - **angle**: The angle to compute the cosecant with in degrees
@@ -504,7 +621,7 @@ impl Math {
 				result *= a;
 			}
 			
-			if b < 0 { 1.0 / result }
+			if b < 0 { result.recip() }
 			else { result }
 		}
 	}
@@ -529,7 +646,7 @@ impl Math {
 	/// let value = Math::sec(-100.0);
 	/// assert_range!(1.159663823, value);
 	/// ```
-	pub fn sec(angle: f32) -> f32 { 1.0 / Math::cos(angle) }
+	pub fn sec(angle: f32) -> f32 { Math::cos(angle).recip() }
 	
 	/// Computes the secant of the given angle in degrees
 	/// - **angle**: The given angle to compute the secant with in degrees
