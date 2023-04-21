@@ -17,6 +17,7 @@ impl Math {
 	pub const RAD_TO_DEG: f32 = 57.2957795131;
 }
 
+// Public Functions
 impl Math {
 	/// Gets the absolute value of the number
 	/// - **value**: The number to get the absolute value from
@@ -134,6 +135,31 @@ impl Math {
 		}
 	}
 	
+	/// Computes the arc cosine (a.k.a. inverse cosine) with the provided value
+	/// - **value**: The value to compute the arc cosine with, must be within -1 and 1
+	/// 
+	/// **Returns**: Returns the angle at which the value exists in degrees,
+	/// returns `NaN` if the value provided is less than -1 or greater than 1
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::acos_deg(0.0);
+	/// assert_range!(90.0, value);
+	/// let value = Math::acos_deg(1.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::acos_deg(-1.0);
+	/// assert_range!(180.0, value);
+	/// let value = Math::acos_deg(0.707106781);
+	/// assert_range!(45.0, value, 0.005);
+	/// let value = Math::acos_deg(0.540302306);
+	/// assert_range!(57.29578, value, 0.001);
+	/// let value = Math::acos_deg(2.0);
+	/// assert!(value.is_nan());
+	/// let value = Math::acos_deg(-1.001);
+	/// assert!(value.is_nan());
+	/// ```
+	pub fn acos_deg(value: f32) -> f32 { Math::RAD_TO_DEG * Math::acos(value) }
+	
 	/// Computes the arc sine (a.k.a. inverse sine) with the provided value
 	/// - **value**: The value to compute the arc sine with, must be within -1 and 1
 	/// 
@@ -180,6 +206,33 @@ impl Math {
 		}
 	}
 	
+	/// Computes the arc sine (a.k.a. inverse sine) with the provided value
+	/// - **value**: The value to compute the arc sine with, must be within -1 and 1
+	/// 
+	/// **Returns**: Returns the angle at which the value exists in degrees,
+	/// returns `NaN` if the value provided is less than -1 or greater than 1
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::asin_deg(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::asin_deg(1.0);
+	/// assert_range!(90.0, value);
+	/// let value = Math::asin_deg(-1.0);
+	/// assert_range!(-90.0, value);
+	/// let value = Math::asin_deg(0.707106781);
+	/// assert_range!(45.0, value, 0.005);
+	/// let value = Math::asin_deg(-1.1);
+	/// assert!(value.is_nan());
+	/// let value = Math::asin_deg(2.0);
+	/// assert!(value.is_nan());
+	/// let value = Math::asin_deg(0.9999);
+	/// assert_range!(89.189644, value);
+	/// let value = Math::asin_deg(-0.25);
+	/// assert_range!(-14.477511, value, 0.005);
+	/// ```
+	pub fn asin_deg(value: f32) -> f32 { Math::RAD_TO_DEG * Math::asin(value) }
+	
 	/// Computes the arc tangent (a.k.a. inverse tangent) with the provided value
 	/// - **value**: The value to compute the arc tangent with
 	/// 
@@ -204,6 +257,26 @@ impl Math {
 			Math::atan2(value, 1.0)
 		}
 	}
+	
+	/// Computes the arc tangent (a.k.a. inverse tangent) with the provided value
+	/// - **value**: The value to compute the arc tangent with
+	/// 
+	/// **Returns**: Returns the angle at which the value exists in degrees
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::atan_deg(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::atan_deg(1.0);
+	/// assert_range!(45.0, value, 0.001);
+	/// let value = Math::atan_deg(-1.0);
+	/// assert_range!(-45.0, value, 0.001);
+	/// let value = Math::atan_deg(0.707106781);
+	/// assert_range!(35.26439, value, 0.001);
+	/// let value = Math::atan_deg(1.557407725);
+	/// assert_range!(57.29578, value);
+	/// ```
+	pub fn atan_deg(value: f32) -> f32 { Math::RAD_TO_DEG * Math::atan(value) }
 	
 	/// Computes the arc tangent (a.k.a. inverse tangent) with the provided x and y values
 	/// - **y**: The y value to compute the arc tangent with
@@ -254,6 +327,31 @@ impl Math {
 			return a;
 		}
 	}
+	
+	/// Computes the arc tangent (a.k.a. inverse tangent) with the provided x and y values
+	/// - **y**: The y value to compute the arc tangent with
+	/// - **x**: The x value to compute the arc tangent with
+	/// 
+	/// **Returns**: Returns the angle at with the two values divided exists in degrees
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::atan2_deg(0.0, 1.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::atan2_deg(1.0, 1.0);
+	/// assert_range!(45.0, value, 0.005);
+	/// let value = Math::atan2_deg(-1.0, 1.0);
+	/// assert_range!(-45.0, value, 0.005);
+	/// let value = Math::atan2_deg(5.0, 1.0);
+	/// assert_range!(78.69007, value);
+	/// let value = Math::atan2_deg(1.0, 5.0);
+	/// assert_range!(11.309933, value);
+	/// let value = Math::atan2_deg(-5.0, 1.0);
+	/// assert_range!(-78.69007, value);
+	/// let value = Math::atan2_deg(-1.0, 5.0);
+	/// assert_range!(-11.309933, value);
+	/// ```
+	pub fn atan2_deg(y: f32, x: f32) -> f32 { Math::RAD_TO_DEG * Math::atan2(y, x) }
 	
 	/// Gets the smallest integer number that is greater than or equal to the given number
 	/// - **value**: The value to get the ceiling with
@@ -967,7 +1065,10 @@ impl Math {
 			(value as i32) as f32
 		}
 	}
-	
+}
+
+// Private Functions
+impl Math {
 	/// Gets the pre-calculated arc tangent values for use in the cordic algorithm
 	/// - **index**: The index to get the pre-calculated value from
 	/// 
@@ -1013,7 +1114,6 @@ impl Math {
 	/// **Returns**: Returns the negated tuple
 	#[cfg(feature = "no_std")]
 	pub(self) fn negate_tuple(tuple: (f32, f32)) -> (f32, f32) { (-tuple.0, -tuple.1) }
-	
 }
 
 #[doc(hidden)]
