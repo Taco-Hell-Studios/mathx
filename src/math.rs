@@ -15,6 +15,8 @@ impl Math {
 	pub const E: f32 = 2.71828182845;
 	pub const DEG_TO_RAD: f32 = 0.01745329251;
 	pub const RAD_TO_DEG: f32 = 57.2957795131;
+	pub const LN2: f32 = 0.69314718056;
+	pub const LN10: f32 = 2.30258509299;
 }
 
 // Public Functions
@@ -628,6 +630,167 @@ impl Math {
 	/// assert_eq!(-5.8, value);
 	/// ```
 	pub fn lerp_unclamped(a: f32, b: f32, t: f32) -> f32 { a + t * (b - a) }
+	
+	/// Computes the natural log of the given number
+	/// - **value**: The value to compute the natural log of
+	/// 
+	/// **Returns**: Returns the natural log of the given value. Returns `infinity` if the value infinity
+	/// and `-infinity` if the value is 0.0. Returns `NaN` if the value is `NaN` or less than 0.0
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::ln(1.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::ln(100.0);
+	/// assert_range!(4.60517018599, value);
+	/// let value = Math::ln(0.01);
+	/// assert_range!(-4.60517018599, value);
+	/// let value = Math::ln(Math::E);
+	/// assert_range!(1.0, value);
+	/// let value = Math::ln(2.0);
+	/// assert_range!(0.69314718056, value);
+	/// let value = Math::ln(10.0);
+	/// assert_range!(2.30258509299, value);
+	/// let value = Math::ln(-10.0);
+	/// assert!(value.is_nan());
+	/// let value = Math::ln(0.0);
+	/// assert!(value.is_infinite());
+	/// ```
+	pub fn ln(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.ln() }
+		#[cfg(feature = "no_std")] {
+			if value.is_nan() { return f32::NAN; }
+			if value == 0.0 { return f32::NEG_INFINITY; }
+			if value < 0.0 { return f32::NAN; }
+			if value < 1.0 { return -Math::ln(value.recip()); }
+			if value.is_infinite() { return f32::INFINITY; }
+			if value == 1.0 { return 0.0; }
+			
+			let mut x = value;
+			let mut ln10_count = 0;
+			let mut ln2_count = 0;
+			
+			while x > 10.0 {
+				x /= 10.0;
+				ln10_count += 1;
+			}
+			while x >= 2.0 {
+				x /= 2.0;
+				ln2_count += 1;
+			}
+			
+			if x == 1.0 { return ln2_count as f32 * Math::LN2 + ln10_count as f32 * Math::LN10; }
+			
+			let term = x - 1.0;
+			let mut power = term;
+			let mut series = power;
+			
+			for i in 2..17 {
+				let negative = if i % 2 == 0 { -1.0 } else { 1.0 };
+				
+				power *= term;
+				series += negative * power / i as f32;
+			}
+			
+			return ln2_count as f32 * Math::LN2 + ln10_count as f32 * Math::LN10 + series;
+		}
+	}
+	
+	/// Computes the natural log of the given number plus one
+	/// - **value**: The value to compute the natural log of
+	/// 
+	/// **Returns**: Returns the natural log of the given value. Returns `infinity` if the value infinity
+	/// and `-infinity` if the value is -1.0. Returns `NaN` if the value is `NaN` or less than -1.0
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::ln_1p(1.0);
+	/// assert_range!(0.6931472, value);
+	/// let value = Math::ln_1p(100.0);
+	/// assert_range!(4.6151204, value);
+	/// let value = Math::ln_1p(0.01);
+	/// assert_range!(0.0099503305, value);
+	/// let value = Math::ln_1p(2.0);
+	/// assert_range!(1.0986123, value);
+	/// let value = Math::ln_1p(10.0);
+	/// assert_range!(2.3978953, value);
+	/// let value = Math::ln_1p(-10.0);
+	/// assert!(value.is_nan());
+	/// let value = Math::ln_1p(0.0);
+	/// assert_range!(0.0, value);
+	/// ```
+	pub fn ln_1p(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.ln_1p() }
+		#[cfg(feature = "no_std")] { Math::ln(value + 1.0) }
+	}
+	
+	/// Computes the log of the given number with a given base
+	/// - **value**: The value to compute the logarithm with
+	/// - **base**: The base of the logarithm
+	/// 
+	/// **Returns**: Returns the computed logarithm
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::log(2.0, 2.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::log(1.0, 2.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::log(10.0, 2.0);
+	/// assert_range!(3.32192809489, value);
+	/// let value = Math::log(16.0, 4.0);
+	/// assert_range!(2.0, value);
+	/// let value = Math::log(2.0, 1.0);
+	/// assert!(value.is_infinite());
+	/// ```
+	pub fn log(value: f32, base: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.log(base) }
+		#[cfg(feature = "no_std")] { Math::ln(value) * Math::ln(base).recip() }
+	}
+	
+	/// Computes the log of the given number with base 10
+	/// - **value**: The value to compute the log with
+	/// 
+	/// **Returns**: Returns the computed log in base 10
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::log10(1.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::log10(2.0);
+	/// assert_range!(0.301029995664, value);
+	/// let value = Math::log10(10.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::log10(50.0);
+	/// assert_range!(1.69897000434, value);
+	/// let value = Math::log10(100.0);
+	/// assert_range!(2.0, value);
+	/// ```
+	pub fn log10(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.log10() }
+		#[cfg(feature = "no_std")] { Math::ln(value) * Math::LN10.recip() }
+	}
+	
+	/// Computes the log of the given number with base 2
+	/// - **value**: The value to compute the log with
+	/// 
+	/// **Returns**: Returns the computed log in base 2
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::log2(1.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::log2(2.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::log2(10.0);
+	/// assert_range!(3.32192809489, value);
+	/// let value = Math::log2(16.0);
+	/// assert_range!(4.0, value);
+	/// ```
+	pub fn log2(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.log2() }
+		#[cfg(feature = "no_std")] { Math::ln(value) * Math::LN2.recip() }
+	}
 	
 	/// Maps the value from one range into another range
 	/// - **value**: The value to map
