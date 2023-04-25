@@ -355,6 +355,41 @@ impl Math {
 	/// ```
 	pub fn atan2_deg(y: f32, x: f32) -> f32 { Math::RAD_TO_DEG * Math::atan2(y, x) }
 	
+	/// Computes e^x
+	/// - **value**: The value to compute with
+	/// 
+	/// **Returns**: Returns the computed e^x
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::exp(0.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::exp(-10.0);
+	/// assert_range!(0.000004539993, value);
+	/// let value = Math::exp(10.0);
+	/// assert_range!(22026.465, value);
+	/// let value = Math::exp(12.34);
+	/// assert_range!(228661.98, value, 0.05);
+	/// let value = Math::exp(2.9);
+	/// assert_range!(18.174147, value);
+	/// ```
+	pub fn exp(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.exp() }
+		#[cfg(feature = "no_std")] {
+			let mut result = 1.0;
+			let mut term = 1.0;
+			let mut n = 1;
+			
+			while n <= 100 {
+				term *= value / n as f32;
+				result += term;
+				n += 1;
+			}
+			
+			return result;
+		}
+	}
+	
 	/// Gets the smallest integer number that is greater than or equal to the given number
 	/// - **value**: The value to get the ceiling with
 	/// 
