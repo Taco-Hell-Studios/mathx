@@ -656,6 +656,20 @@ impl Math {
 	/// ```
 	pub fn csc_deg(angle: f32) -> f32 { Math::csc(Math::DEG_TO_RAD * angle) }
 	
+	/// Converts the value from degrees to radians
+	/// - **degrees**: The value in degrees to convert
+	/// 
+	/// **Returns**: Returns the value in radians
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// let value = Math::deg2rad(35.0);
+	/// assert_eq!(0.610865238198, value);
+	/// let value = Math::deg2rad(300.0);
+	/// assert_eq!(5.23598775598, value);
+	/// ```
+	pub fn deg2rad(degrees: f32) -> f32 { Math::DEG_TO_RAD * degrees }
+	
 	/// Computes e^x
 	/// - **value**: The value to compute with
 	/// 
@@ -1112,6 +1126,20 @@ impl Math {
 			else { result }
 		}
 	}
+	
+	/// Converts the value from radians to degrees
+	/// - **radians**: The value in radians to convert
+	/// 
+	/// **Returns**: Returns the value in degrees
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// let value = Math::rad2deg(1.0);
+	/// assert_eq!(57.2957795131, value);
+	/// let value = Math::rad2deg(4.0);
+	/// assert_eq!(229.183118052, value);
+	/// ```
+	pub fn rad2deg(radians: f32) -> f32 { Math::RAD_TO_DEG * radians }
 	
 	/// Repeats the value around the range, making sure it stays within the range
 	/// - **value**: The value to repeat
