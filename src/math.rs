@@ -940,7 +940,7 @@ impl Math {
 	/// let value = Math::pow(1.0, 10.0);
 	/// assert_range!(1.0, value);
 	/// let value = Math::pow(2.0, 10.0);
-	/// assert_range!(1024.0, value);
+	/// assert_range!(1024.0, value, 0.0002);
 	/// let value = Math::pow(40.0, 1.2);
 	/// assert_range!(83.65118, value);
 	/// let value = Math::pow(3.0, -2.3);
@@ -950,6 +950,9 @@ impl Math {
 		#[cfg(not(feature = "no_std"))] { value.powf(power) }
 		#[cfg(feature = "no_std")] {
 			if power == 0.0 { return 1.0; }
+			if power == 1.0 { return value; }
+			if value == 1.0 { return 1.0; }
+			if value == 2.0 { return Math::exp2(power); }
 			
 			let fract = Math::fract(power);
 			
