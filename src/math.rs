@@ -355,41 +355,6 @@ impl Math {
 	/// ```
 	pub fn atan2_deg(y: f32, x: f32) -> f32 { Math::RAD_TO_DEG * Math::atan2(y, x) }
 	
-	/// Computes e^x
-	/// - **value**: The value to compute with
-	/// 
-	/// **Returns**: Returns the computed e^x
-	/// #### Examples
-	/// ```
-	/// # use mathx::{Math,assert_range};
-	/// let value = Math::exp(0.0);
-	/// assert_range!(1.0, value);
-	/// let value = Math::exp(-10.0);
-	/// assert_range!(0.000004539993, value);
-	/// let value = Math::exp(10.0);
-	/// assert_range!(22026.465, value);
-	/// let value = Math::exp(12.34);
-	/// assert_range!(228661.98, value, 0.05);
-	/// let value = Math::exp(2.9);
-	/// assert_range!(18.174147, value);
-	/// ```
-	pub fn exp(value: f32) -> f32 {
-		#[cfg(not(feature = "no_std"))] { value.exp() }
-		#[cfg(feature = "no_std")] {
-			let mut result = 1.0;
-			let mut term = 1.0;
-			let mut n = 1;
-			
-			while n <= 100 {
-				term *= value / n as f32;
-				result += term;
-				n += 1;
-			}
-			
-			return result;
-		}
-	}
-	
 	/// Gets the smallest integer number that is greater than or equal to the given number
 	/// - **value**: The value to get the ceiling with
 	/// 
@@ -577,6 +542,68 @@ impl Math {
 	/// ```
 	pub fn csc_deg(angle: f32) -> f32 { Math::csc(Math::DEG_TO_RAD * angle) }
 	
+	/// Computes e^x
+	/// - **value**: The value to compute with
+	/// 
+	/// **Returns**: Returns the computed e^x
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::exp(0.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::exp(-10.0);
+	/// assert_range!(0.000004539993, value);
+	/// let value = Math::exp(10.0);
+	/// assert_range!(22026.465, value);
+	/// let value = Math::exp(12.34);
+	/// assert_range!(228661.98, value, 0.05);
+	/// let value = Math::exp(2.9);
+	/// assert_range!(18.174147, value);
+	/// ```
+	pub fn exp(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.exp() }
+		#[cfg(feature = "no_std")] {
+			if value < 0.0 { return Math::exp(-value).recip(); }
+			
+			let mut result = 1.0;
+			let mut term = 1.0;
+			let mut n = 1;
+			
+			while n <= 100 {
+				term *= value / n as f32;
+				result += term;
+				n += 1;
+			}
+			
+			return result;
+		}
+	}
+	
+	/// Computes 2^x
+	/// - **value**: The value to compute with
+	/// 
+	/// **Returns**: Returns the computed 2^x
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::exp2(0.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::exp2(-10.0);
+	/// assert_range!(0.0009765625, value);
+	/// let value = Math::exp2(10.0);
+	/// assert_range!(1024.0, value, 0.0002);
+	/// let value = Math::exp2(12.34);
+	/// assert_range!(5184.5396, value, 0.05);
+	/// let value = Math::exp2(2.9);
+	/// assert_range!(7.464265, value);
+	/// ```
+	pub fn exp2(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.exp2() }
+		#[cfg(feature = "no_std")] {
+			Math::exp(value * Math::LN2)
+		}
+	}
+	
 	/// Gets the largest integer number that is less than or equal to the given number
 	/// - **value**: The value to get the floor with
 	/// 
@@ -613,18 +640,18 @@ impl Math {
 	/// #### Examples
 	/// ```
 	/// # use mathx::{Math,assert_range};
-	/// let value = Math::frac(3.0);
+	/// let value = Math::fract(3.0);
 	/// assert_range!(0.0, value);
-	/// let value = Math::frac(-3.0);
+	/// let value = Math::fract(-3.0);
 	/// assert_range!(0.0, value);
-	/// let value = Math::frac(4.9);
+	/// let value = Math::fract(4.9);
 	/// assert_range!(0.9, value);
-	/// let value = Math::frac(-4.9);
+	/// let value = Math::fract(-4.9);
 	/// assert_range!(0.1, value);
-	/// let value = Math::frac(12.34);
+	/// let value = Math::fract(12.34);
 	/// assert_range!(0.34, value);
 	/// ```
-	pub fn frac(value: f32) -> f32 { value - Math::floor(value) }
+	pub fn fract(value: f32) -> f32 { value - Math::floor(value) }
 	
 	/// Linearly interpolates between the first and second values
 	/// - **a**: The first value to start from
@@ -899,6 +926,38 @@ impl Math {
 	/// assert_eq!((-19.1, -19.0), value);
 	/// ```
 	pub fn min_max(a: f32, b: f32) -> (f32, f32) { (Math::min(a, b), Math::max(a, b)) }
+	
+	/// Raised the value by the power (as a floating point number)
+	/// - **value**: The value to raise with
+	/// - **power**: The power to raise by
+	/// 
+	/// **Returns**: Returns the value raised by the power
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::pow(1.0, 0.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::pow(1.0, 10.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::pow(2.0, 10.0);
+	/// assert_range!(1024.0, value);
+	/// let value = Math::pow(40.0, 1.2);
+	/// assert_range!(83.65118, value);
+	/// let value = Math::pow(3.0, -2.3);
+	/// assert_range!(0.07991368, value);
+	/// ```
+	pub fn pow(value: f32, power: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.powf(power) }
+		#[cfg(feature = "no_std")] {
+			if power == 0.0 { return 1.0; }
+			
+			let fract = Math::fract(power);
+			
+			if fract == 0.0 { return Math::pow_i32(value, power as i32); }
+			
+			Math::exp(power * Math::ln(value))
+		}
+	}
 	
 	/// Gets the power of the given number by the other given number, with the power being an `i32`
 	/// - **a**: The base number to power
