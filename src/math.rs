@@ -1113,6 +1113,85 @@ impl Math {
 		}
 	}
 	
+	/// Rounds the given value to the nearest zero
+	/// - **value**: The value to round with
+	/// 
+	/// **Returns**: Returns the rounded value
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// let value = Math::round(0.0);
+	/// assert_eq!(0.0, value);
+	/// let value = Math::round(1.1);
+	/// assert_eq!(1.0, value);
+	/// let value = Math::round(2.9);
+	/// assert_eq!(3.0, value);
+	/// let value = Math::round(3.5);
+	/// assert_eq!(4.0, value);
+	/// let value = Math::round(-4.5);
+	/// assert_eq!(-5.0, value);
+	/// let value = Math::round(-5.45);
+	/// assert_eq!(-5.0, value);
+	/// ```
+	pub fn round(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.round() }
+		#[cfg(feature = "no_std")] {
+			let mut fraction = Math::fract(value);
+			let truncated = Math::trunc(value);
+			
+			if value < 0.0 && fraction > 0.0 { fraction = 1.0 - fraction; }
+			
+			if fraction >= 0.5 {
+				return truncated + Math::sign(value);
+			}
+			
+			return truncated;
+		}
+	}
+	
+	/// Rounds the value up to the given amount of digits past the decimal
+	/// - **value**: The value to round with
+	/// - **digits**: The digit past the decimal to round to, must be between -15 and 15
+	/// 
+	/// #### Examples
+	/// ```
+	/// # use mathx::Math;
+	/// let value = Math::round_to_digit(1.0, 0);
+	/// assert_eq!(1.0, value);
+	/// let value = Math::round_to_digit(-1.0, 0);
+	/// assert_eq!(-1.0, value);
+	/// let value = Math::round_to_digit(1.525, 0);
+	/// assert_eq!(2.0, value);
+	/// let value = Math::round_to_digit(1.525, 1);
+	/// assert_eq!(1.5, value);
+	/// let value = Math::round_to_digit(1.525, 2);
+	/// assert_eq!(1.53, value);
+	/// let value = Math::round_to_digit(-1.525, 0);
+	/// assert_eq!(-2.0, value);
+	/// let value = Math::round_to_digit(-1.525, 2);
+	/// assert_eq!(-1.53, value);
+	/// let value = Math::round_to_digit(-2.4, 0);
+	/// assert_eq!(-2.0, value);
+	/// let value = Math::round_to_digit(-2.6, 0);
+	/// assert_eq!(-3.0, value);
+	/// ```
+	pub fn round_to_digit(value: f32, digits: i32) -> f32 {
+		let digits = digits.clamp(-15, 15);
+		let pow10 = Math::pow_i32(10.0, digits);
+		let powered = value * pow10;
+		let mut fraction = Math::fract(powered);
+		let truncated = Math::trunc(powered);
+		
+		if fraction == 0.0 { return value; }
+		if value < 0.0 { fraction = 1.0 - fraction; }
+		
+		if fraction >= 0.5 {
+			return (truncated + Math::sign(value)) / pow10;
+		}
+		
+		return truncated / pow10;
+	}
+	
 	/// Computes the secant of the given angle in radians
 	/// - **angle**: The given angle to compute the secant with in radians
 	/// 
