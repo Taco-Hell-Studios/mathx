@@ -162,6 +162,32 @@ impl Math {
 	/// ```
 	pub fn acos_deg(value: f32) -> f32 { Math::RAD_TO_DEG * Math::acos(value) }
 	
+	/// Computes the arc hyperbolic cosine (a.k.a. inverse hyperbolic cosine)
+	/// - **value**: The value to compute with
+	/// 
+	/// **Returns**: Returns the computed inverse hyperbolic cosine
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::acosh(0.0);
+	/// assert!(value.is_nan());
+	/// let value = Math::acosh(1.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::acosh(1.54308063482);
+	/// assert_range!(1.0, value);
+	/// let value = Math::acosh(11.591954);
+	/// assert_range!(Math::PI, value);
+	/// let value = Math::acosh(7.6101246);
+	/// assert_range!(Math::E, value);
+	/// ```
+	pub fn acosh(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.acosh() }
+		#[cfg(feature = "no_std")] {
+			if value < 1.0 { return f32::NAN; }
+			Math::ln(value + Math::sqrt(value * value - 1.0))
+		}
+	}
+	
 	/// Computes the arc sine (a.k.a. inverse sine) with the provided value
 	/// - **value**: The value to compute the arc sine with, must be within -1 and 1
 	/// 
@@ -235,6 +261,33 @@ impl Math {
 	/// ```
 	pub fn asin_deg(value: f32) -> f32 { Math::RAD_TO_DEG * Math::asin(value) }
 	
+	/// Computes the arc hyperbolic sine (a.k.a. inverse hyperbolic sine)
+	/// - **value**: The value to compute with
+	/// 
+	/// **Returns**: Returns the computed inverse hyperbolic sine
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::asinh(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::asinh(1.0);
+	/// assert_range!(0.8813736, value);
+	/// let value = Math::asinh(1.1752012);
+	/// assert_range!(1.0, value);
+	/// let value = Math::asinh(-1.1752012);
+	/// assert_range!(-1.0, value);
+	/// let value = Math::asinh(11.54874);
+	/// assert_range!(Math::PI, value);
+	/// let value = Math::asinh(7.5441365);
+	/// assert_range!(Math::E, value);
+	/// ```
+	pub fn asinh(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.asinh() }
+		#[cfg(feature = "no_std")] {
+			Math::ln(value + Math::sqrt(value * value + 1.0))
+		}
+	}
+	
 	/// Computes the arc tangent (a.k.a. inverse tangent) with the provided value
 	/// - **value**: The value to compute the arc tangent with
 	/// 
@@ -279,6 +332,35 @@ impl Math {
 	/// assert_range!(57.29578, value);
 	/// ```
 	pub fn atan_deg(value: f32) -> f32 { Math::RAD_TO_DEG * Math::atan(value) }
+	
+	/// Computes the arc hyperbolic tangent (a.k.a. inverse hyperbolic tangent)
+	/// - **value**: The value to compute with
+	/// 
+	/// **Returns**: Returns the computed inverse hyperbolic tangent
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::atanh(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::atanh(1.0);
+	/// assert!(value.is_infinite());
+	/// let value = Math::atanh(0.7615942);
+	/// assert_range!(1.0, value, 0.001);
+	/// let value = Math::atanh(-0.7615942);
+	/// assert_range!(-1.0, value, 0.001);
+	/// let value = Math::atanh(0.9962721);
+	/// assert_range!(Math::PI, value);
+	/// let value = Math::atanh(0.9913289);
+	/// assert_range!(Math::E, value);
+	/// ```
+	pub fn atanh(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.atanh() }
+		#[cfg(feature = "no_std")] {
+			if value >= 1.0 { return f32::INFINITY; }
+			if value <= -1.0 { return f32::NEG_INFINITY; }
+			0.5 * Math::ln((1.0 + value) * (1.0 - value).recip())
+		}
+	}
 	
 	/// Computes the arc tangent (a.k.a. inverse tangent) with the provided x and y values
 	/// - **y**: The y value to compute the arc tangent with
@@ -359,7 +441,7 @@ impl Math {
 	/// - **value**: The value to get the ceiling with
 	/// 
 	/// **Returns**: Returns the ceiling number
-	/// #### Example
+	/// #### Examples
 	/// ```
 	/// # use mathx::Math;
 	/// let value = Math::ceil(-3.0);
@@ -461,6 +543,38 @@ impl Math {
 	/// assert_range!(0.862318872, value);
 	/// ```
 	pub fn cos_deg(angle: f32) -> f32 { Math::cos(Math::DEG_TO_RAD * angle) }
+	
+	/// Computes the hyperbolic cosine function
+	/// - **value**: The value to compute the hyperbolic cosine function
+	/// 
+	/// **Returns**: Returns the computed hyperbolic cosine function
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::cosh(0.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::cosh(1.0);
+	/// assert_range!(1.54308063482, value);
+	/// let value = Math::cosh(-1.0);
+	/// assert_range!(1.54308063482, value);
+	/// let value = Math::cosh(Math::PI);
+	/// assert_range!(11.591954, value);
+	/// let value = Math::cosh(Math::E);
+	/// assert_range!(7.6101246, value);
+	/// ```
+	pub fn cosh(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.cosh() }
+		#[cfg(feature = "no_std")] {
+			let exp = Math::exp(value);
+			
+			if exp.is_infinite() || exp.is_nan() {
+				if value > 0.0 { return f32::INFINITY; }
+				else { return f32::NEG_INFINITY; }
+			}
+			
+			(exp + exp.recip()) * 0.5
+		}
+	}
 	
 	/// Computes the cotangent of the given angle in radians
 	/// - **angle**: The angle to compute the cotangent with in radians
@@ -608,7 +722,7 @@ impl Math {
 	/// - **value**: The value to get the floor with
 	/// 
 	/// **Returns**: Returns the floored number
-	/// #### Example
+	/// #### Examples
 	/// ```
 	/// # use mathx::Math;
 	/// let value = Math::floor(-3.0);
@@ -947,17 +1061,17 @@ impl Math {
 	/// assert_range!(0.07991368, value);
 	/// ```
 	pub fn pow(value: f32, power: f32) -> f32 {
+		if power == 0.0 { return 1.0; }
+		if power == 1.0 { return value; }
+		if value == 1.0 { return 1.0; }
+		if value == 2.0 { return Math::exp2(power); }
+		
+		let fract = Math::fract(power);
+		
+		if fract == 0.0 { return Math::pow_i32(value, Math::floor(power) as i32); }
+		
 		#[cfg(not(feature = "no_std"))] { value.powf(power) }
 		#[cfg(feature = "no_std")] {
-			if power == 0.0 { return 1.0; }
-			if power == 1.0 { return value; }
-			if value == 1.0 { return 1.0; }
-			if value == 2.0 { return Math::exp2(power); }
-			
-			let fract = Math::fract(power);
-			
-			if fract == 0.0 { return Math::pow_i32(value, power as i32); }
-			
 			Math::exp(power * Math::ln(value))
 		}
 	}
@@ -1207,6 +1321,38 @@ impl Math {
 	/// ```
 	pub fn sin_cos_deg(angle: f32) -> (f32, f32) { Math::sin_cos(Math::DEG_TO_RAD * angle) }
 	
+	/// Computes the hyperbolic sine function
+	/// - **value**: The value to compute the hyperbolic sine function with
+	/// 
+	/// **Returns**: Returns the computed hyperbolic sine function
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::sinh(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::sinh(1.0);
+	/// assert_range!(1.1752012, value);
+	/// let value = Math::sinh(-1.0);
+	/// assert_range!(-1.1752012, value);
+	/// let value = Math::sinh(Math::PI);
+	/// assert_range!(11.54874, value);
+	/// let value = Math::sinh(Math::E);
+	/// assert_range!(7.5441365, value);
+	/// ```
+	pub fn sinh(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.sinh() }
+		#[cfg(feature = "no_std")] {
+			let exp = Math::exp(value);
+			
+			if exp.is_infinite() || exp.is_nan() {
+				if value > 0.0 { return f32::INFINITY; }
+				else { return f32::NEG_INFINITY; }
+			}
+			
+			(exp - exp.recip()) * 0.5
+		}
+	}
+	
 	/// Computes a smooth Hermite interpolation that returns a number between 0.0 and 1.0
 	/// - **value**: The value for the interpolation, where `left_edge` &lt; `value` &lt; `right_edge`
 	/// - **left_edge**: The leftmost edge to where 0.0 would start at
@@ -1317,6 +1463,39 @@ impl Math {
 	/// assert_range!(0.587213915, value);
 	/// ```
 	pub fn tan_deg(angle: f32) -> f32 { Math::tan(Math::DEG_TO_RAD * angle) }
+	
+	
+	/// Computes the hyperbolic tangent function
+	/// - **value**: The value to compute the hyperbolic tangent function with
+	/// 
+	/// **Returns**: Returns the computed hyperbolic tangent function
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::tanh(0.0);
+	/// assert_range!(0.0, value);
+	/// let value = Math::tanh(1.0);
+	/// assert_range!(0.7615942, value);
+	/// let value = Math::tanh(-1.0);
+	/// assert_range!(-0.7615942, value);
+	/// let value = Math::tanh(Math::PI);
+	/// assert_range!(0.9962721, value);
+	/// let value = Math::tanh(Math::E);
+	/// assert_range!(0.9913289, value);
+	/// ```
+	pub fn tanh(value: f32) -> f32 {
+		#[cfg(not(feature = "no_std"))] { value.tanh() }
+		#[cfg(feature = "no_std")] {
+			let exp = Math::exp(2.0 * value);
+			
+			if exp.is_infinite() || exp.is_nan() {
+				if value > 0.0 { return 1.0; }
+				else { return -1.0; }
+			}
+			
+			(exp - 1.0) * (exp + 1.0).recip()
+		}
+	}
 	
 	/// Truncates the value of the floating point number
 	/// - **value**: The number to truncate
