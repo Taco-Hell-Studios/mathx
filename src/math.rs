@@ -1113,6 +1113,40 @@ impl Math {
 		}
 	}
 	
+	/// Repeats the value around the range, making sure it stays within the range
+	/// - **value**: The value to repeat
+	/// - **range**: The range to repeat around
+	/// 
+	/// **Returns**: Returns the wrapped value
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,assert_range};
+	/// let value = Math::repeat(1.0, 0.0..2.0);
+	/// assert_range!(1.0, value);
+	/// let value = Math::repeat(1.0, 2.0..3.0);
+	/// assert_range!(3.0, value);
+	/// let value = Math::repeat(5.3, 0.0..3.0);
+	/// assert_range!(2.3, value);
+	/// let value = Math::repeat(-4.0, 0.0..1.23);
+	/// assert_range!(0.31, value);
+	/// let value = Math::repeat(-4.0, 10.0..12.23);
+	/// assert_range!(10.620003, value);
+	/// ```
+	pub fn repeat(value: f32, range: Range<f32>) -> f32 {
+		if value >= range.start && value <= range.end {
+			return value;
+		}
+		
+		let x = value - range.start;
+		let distance = range.end - range.start;
+		
+		if x < 0.0 {
+			return range.end - distance * Math::fract(x * distance.recip());
+		}
+		
+		return distance * Math::fract(x * distance.recip()) + range.start;
+	}
+	
 	/// Rounds the given value to the nearest zero
 	/// - **value**: The value to round with
 	/// 
