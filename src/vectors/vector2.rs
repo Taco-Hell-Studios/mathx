@@ -1,4 +1,6 @@
 
+use core::ops::Neg;
+
 use crate::Math;
 use crate::Vector3;
 use crate::{AddSubArithmetic, MulDivScalar, use_impl_ops, impl_add, impl_sub, impl_mul, impl_div};
@@ -114,11 +116,50 @@ impl Vector2 {
 	/// assert_eq!(1.0, vector.y());
 	/// ```
 	pub fn one() -> Self { Vector2 { x: 1.0, y: 1.0 } }
+	
+	/// Creates a 2D vector from a single angle (heading)
+	/// - **angle**: The angle in radians to create the 2D vector from
+	/// 
+	/// **Returns**: Returns a 2D vector from the single angle
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Vector2,Math,assert_range};
+	/// let vector = Vector2::from_heading(Math::PI_OVER_4);
+	/// assert_range!(0.7071068, vector.x());
+	/// assert_range!(0.7071068, vector.y());
+	/// let vector = Vector2::from_heading(4.0);
+	/// assert_range!(-0.653643620864, vector.x());
+	/// assert_range!(-0.756802495308, vector.y());
+	/// ```
+	pub fn from_heading(angle: f32) -> Self {
+		let (sin, cos) = Math::sin_cos(angle);
+		
+		Vector2::new(cos, sin)
+	}
+	
+	/// Creates a 2D vector from a single angle (heading)
+	/// - **angle**: The angle in degrees to create the 2D vector from
+	/// 
+	/// **Returns**: Returns a 2D vector from the single angle
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Vector2,Math,assert_range};
+	/// let vector = Vector2::from_heading_deg(45.0);
+	/// assert_range!(0.7071068, vector.x());
+	/// assert_range!(0.7071068, vector.y());
+	/// let vector = Vector2::from_heading_deg(229.183118052);
+	/// assert_range!(-0.653643620864, vector.x());
+	/// assert_range!(-0.756802495308, vector.y());
+	/// ```
+	pub fn from_heading_deg(angle: f32) -> Self {
+		let (sin, cos) = Math::sin_cos_deg(angle);
+		
+		Vector2::new(cos, sin)
+	}
 }
 
 // Properties
 impl Vector2 {
-	// Getters
 	/// Gets the x coordinate of the vector
 	/// 
 	/// **Returns**: Returns the x coordinate of the vector
@@ -129,6 +170,17 @@ impl Vector2 {
 	/// assert_eq!(10.0, a.x());
 	/// ```
 	pub fn x(&self) -> f32 { self.x }
+	
+	/// Sets the x coordinate of the vector
+	/// - **value**: The value to set the x coordinate of the vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector2;
+	/// let mut a = Vector2::left();
+	/// a.set_x(-100.0);
+	/// assert_eq!(-100.0, a.x());
+	/// ```
+	pub fn set_x(&mut self, value: f32) { self.x = value; }
 	
 	/// Gets the y coordinate of the vector
 	/// 
@@ -141,18 +193,6 @@ impl Vector2 {
 	/// ```
 	pub fn y(&self) -> f32 { self.y }
 	
-	// Setters
-	/// Sets the x coordinate of the vector
-	/// - **value**: The value to set the x coordinate of the vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector2;
-	/// let mut a = Vector2::left();
-	/// a.set_x(-100.0);
-	/// assert_eq!(-100.0, a.x());
-	/// ```
-	pub fn set_x(&mut self, value: f32) { self.x = value; }
-	
 	/// Sets the y coordinate of the vector
 	/// - **value**: The value to set the y coordinate of the vector
 	/// #### Examples
@@ -163,6 +203,59 @@ impl Vector2 {
 	/// assert_eq!(6.0, a.y());
 	/// ```
 	pub fn set_y(&mut self, value: f32) { self.y = value; }
+	
+	/// Get the heading from the vector in radians
+	/// 
+	/// **Returns**: Returns the heading from the vector in radians
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,Vector2,assert_range};
+	/// let heading = Vector2::one().heading();
+	/// assert_range!(Math::PI_OVER_4, heading);
+	/// ```
+	pub fn heading(&self) -> f32 { Math::atan2(self.y, self.x) }
+	
+	/// Sets the heading for the vector in radians
+	/// - **angle**: The angle to set the heading of the vector for in radians
+	/// 
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,Vector2,assert_range};
+	/// let mut vector = Vector2::zero();
+	/// vector.set_heading(Math::PI_OVER_4);
+	/// assert_range!(0.70710678118, vector.x());
+	/// assert_range!(0.70710678118, vector.y());
+	/// ```
+	pub fn set_heading(&mut self, angle: f32) {
+		let vector = Vector2::from_heading(angle);
+		
+		self.x = vector.x;
+		self.y = vector.y;
+	}
+	
+	/// Get the heading from the vector in degrees
+	/// 
+	/// **Returns**: Returns the heading from the vector in degrees
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,Vector2,assert_range};
+	/// let heading = Vector2::one().heading_deg();
+	/// assert_range!(45.0, heading, 0.001);
+	/// ```
+	pub fn heading_deg(&self) -> f32 { Math::rad2deg(self.heading()) }
+	
+	/// Sets the heading for the vector in degrees
+	/// - **angle**: The angle to set the heading of the vector for in degrees
+	/// 
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Math,Vector2,assert_range};
+	/// let mut vector = Vector2::zero();
+	/// vector.set_heading_deg(45.0);
+	/// assert_range!(0.70710678118, vector.x());
+	/// assert_range!(0.70710678118, vector.y());
+	/// ```
+	pub fn set_heading_deg(&mut self, angle: f32) { self.set_heading(Math::deg2rad(angle)) }
 	
 	/// Gets the magnitude of the vector. This returns the length of the vector
 	/// 
@@ -227,6 +320,42 @@ impl Vector2 {
 	pub fn dot(self, rhs: Vector2) -> f32 {
 		self.x * rhs.x + self.y * rhs.y
 	}
+	
+	/// Normalizes the vector
+	/// 
+	/// **Returns**: Returns the unit vector version of this vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Vector2,Math,assert_range};
+	/// let vector = Vector2::one().normalize();
+	/// assert_range!(0.70710678118, vector.x());
+	/// assert_range!(0.70710678118, vector.y());
+	/// let vector = Vector2::new(-0.1, 1.0).normalize();
+	/// assert_range!(-0.09950372, vector.x());
+	/// assert_range!(0.99503714, vector.y());
+	/// ```
+	pub fn normalize(self) -> Self {
+		let magnitude = self.magnitude();
+		
+		if magnitude == 0.0 { return Vector2::zero(); }
+		if magnitude == 1.0 { return self; }
+		
+		let inverse_magnitude = magnitude.recip();
+		
+		return inverse_magnitude * self;
+	}
+	
+	/// Creates a perpendicular 2D vector
+	/// 
+	/// **Returns**: Returns a perpendicular 2D vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector2;
+	/// let vector = Vector2::new(1.0, 2.0);
+	/// let perpendicular = vector.perpendicular();
+	/// assert_eq!(0.0, vector * perpendicular);
+	/// ```
+	pub fn perpendicular(self) -> Self { Vector2::new(self.y, -self.x) }
 }
 
 // Conversions
@@ -237,6 +366,9 @@ impl Vector2 {
 impl From<Vector3> for Vector2 {
 	fn from(value: Vector3) -> Self { Vector2::from_vector3(value) }
 }
+
+unsafe impl Send for Vector2 {}
+unsafe impl Sync for Vector2 {}
 
 // Equates
 impl Eq for Vector2 {}
@@ -324,10 +456,16 @@ impl MulDivScalar for Vector2 {
 	}
 }
 
+impl Neg for Vector2 {
+	type Output = Vector2;
+	fn neg(self) -> Self::Output { Vector2::new(-self.x, -self.y) }
+}
+
 use_impl_ops!();
 impl_add!(Vector2);
 impl_add!(Vector2 => Vector3: Vector3);
 impl_sub!(Vector2);
 impl_sub!(Vector2 => Vector3: Vector3);
 impl_mul!(Vector2);
+impl_mul!(Vector2, Vector2 => f32: dot);
 impl_div!(Vector2);
