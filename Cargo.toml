@@ -1,12 +1,13 @@
 [package]
 name = "mathx"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2021"
 license-file = "LICENSE"
 authors = ["Paul Casanova <pgonzbecer@gmail.com>"]
 description = "A mathematics library designed to work with no_std"
 repository = "https://github.com/Taco-Hell-Studios/mathx"
 homepage = "https://tacoheck.com/software/rust/mathx"
+documentation = "https://docs.rs/mathx/"
 keywords = [
 	"math",
 	"no_std",

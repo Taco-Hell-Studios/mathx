@@ -810,13 +810,13 @@ impl Math {
 	/// #### Examples
 	/// ```
 	/// # use mathx::Math;
-	/// let value = Math::lerp(0.0, 1.0, 0.5);
+	/// let value = Math::lerp_unclamped(0.0, 1.0, 0.5);
 	/// assert_eq!(0.5, value);
-	/// let value = Math::lerp(0.0, 0.1, 0.9);
+	/// let value = Math::lerp_unclamped(0.0, 0.1, 0.9);
 	/// assert_eq!(0.089999996, value);
-	/// let value = Math::lerp(-10.0, 10.0, 0.6);
+	/// let value = Math::lerp_unclamped(-10.0, 10.0, 0.6);
 	/// assert_eq!(2.0, value);
-	/// let value = Math::lerp(-10.0, -4.0, 0.7);
+	/// let value = Math::lerp_unclamped(-10.0, -4.0, 0.7);
 	/// assert_eq!(-5.8, value);
 	/// ```
 	pub fn lerp_unclamped(a: f32, b: f32, t: f32) -> f32 { a + t * (b - a) }
@@ -1541,6 +1541,7 @@ impl Math {
 		#[cfg(feature = "no_std")] {
 			if value < -0.0 { return f32::NAN; }
 			if value == 0.0 { return 0.0; }
+			if value == 1.0 { return 1.0; }
 			
 			let mut max = 50;
 			let mut x = value;
