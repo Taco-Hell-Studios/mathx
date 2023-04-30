@@ -300,8 +300,50 @@ impl Vector3 {
 	pub fn square_magnitude(&self) -> f32 { self.x * self.x + self.y * self.y + self.z * self.z }
 }
 
-// Special Vector Functions
+// Public Methods
 impl Vector3 {
+	pub fn rotate_towards(self, target: Vector3, radians_delta: f32, magnitude_delta: f32) -> Self {
+		todo!()
+	}
+	pub fn slerp(self, rhs: Vector3, t: f32) -> Self {
+		todo!()
+	}
+	pub fn slerp_unclamped(self, rhs: Vector3, t: f32) -> Self {
+		todo!()
+	}
+	
+	
+	/// Gets the angle between the two vectors in radians
+	/// - **rhs**: The other vector to get the angle from
+	/// 
+	/// **Returns**: Returns the angle between the two vectors in radians
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Vector3,Math,assert_range};
+	/// let a = Vector3::new(0.25, -0.5, 1.25);
+	/// let b = Vector3::new(2.0, 0.5, -1.0);
+	/// assert_range!(1.89518322157, a.angle_between(b));
+	/// ```
+	pub fn angle_between(self, rhs: Vector3) -> f32 {
+		let value = Math::sqrt(self.square_magnitude() * rhs.square_magnitude());;
+		
+		if value < 0.0000000001 { return 0.0; }
+		else { return Math::acos(Math::clamp((self * rhs) / value, -1.0, 1.0)); }
+	}
+	
+	/// Gets the angle between the two vectors in degrees
+	/// - **rhs**: The other vector to get the angle from
+	/// 
+	/// **Returns**: Returns the angle between the two vectors in degrees
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Vector3,Math,assert_range};
+	/// let a = Vector3::new(0.25, -0.5, 1.25);
+	/// let b = Vector3::new(2.0, 0.5, -1.0);
+	/// assert_range!(108.586, a.angle_between_deg(b), 0.01);
+	/// ```
+	pub fn angle_between_deg(self, rhs: Vector3) -> f32 { return Math::rad2deg(self.angle_between(rhs)); }
+	
 	/// Performs a cross product and creates a 3D vector that is orthogonal to both vectors provided
 	/// - **rhs**: The other vector to cross product
 	/// 
@@ -323,6 +365,19 @@ impl Vector3 {
 			self.x * rhs.y - self.y * rhs.x
 		)
 	}
+	
+	/// Gets the distance between the two vectors
+	/// - **rhs**: The other vector to get the distance between
+	/// 
+	/// **Returns**: Returns the distance between the two vectors
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector3;
+	/// let a = Vector3::new(0.25, -0.5, 1.25);
+	/// let b = Vector3::new(2.0, 0.5, -1.0);
+	/// assert_eq!(3.0207615, a.distance(b));
+	/// ```
+	pub fn distance(self, rhs: Vector3) -> f32 { (rhs - self).magnitude() }
 	
 	/// Gets the dot product of between the two vectors.
 	/// It can be used to determine the angle between two vectors.
@@ -361,6 +416,68 @@ impl Vector3 {
 	/// ```
 	pub fn dot(self, rhs: Vector3) -> f32 {
 		self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+	}
+	
+	/// Linearly interpolates between the this and the other vector
+	/// - **rhs**: The other vector to end from
+	/// - **t**: The ratio value to interpolate between both vectors. Clamped between 0.0 and 1.0
+	/// 
+	/// **Returns**: Returns the interpolated vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector3;
+	/// let a = Vector3::new(0.0, 4.0, -10.0);
+	/// let b = Vector3::new(1.0, 10.0, -4.0);
+	/// let expected = Vector3::new(0.7, 8.2, -5.8);
+	/// assert_eq!(expected, a.lerp(b, 0.7));
+	/// ```
+	pub fn lerp(self, rhs: Vector3, t: f32) -> Self { self.lerp_unclamped(rhs, t.clamp(0.0, 1.0)) }
+	
+	/// Linearly interpolates between the this and the other vector (not clamped)
+	/// - **rhs**: The other vector to end from
+	/// - **t**: The ratio value to interpolate between both vectors
+	/// 
+	/// **Returns**: Returns the interpolated vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector3;
+	/// let a = Vector3::new(0.0, 4.0, -10.0);
+	/// let b = Vector3::new(1.0, 10.0, -4.0);
+	/// let expected = Vector3::new(0.7, 8.2, -5.8);
+	/// assert_eq!(expected, a.lerp_unclamped(b, 0.7));
+	/// ```
+	pub fn lerp_unclamped(self, rhs: Vector3, t: f32) -> Self {
+		Vector3::new(
+			Math::lerp_unclamped(self.x, rhs.x, t),
+			Math::lerp_unclamped(self.y, rhs.y, t),
+			Math::lerp_unclamped(self.z, rhs.z, t)
+		)
+	}
+	
+	/// Moves this vector towards the target vector, it will never move past the target
+	/// - **target**: The target vector to move towards
+	/// - **delta**: The delta distance to try and move with, defines the maximum distance moved
+	/// 
+	/// **Returns**: Returns the vector that is closer towards the target
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector3;
+	/// let a = Vector3::new(0.25, -0.5, 1.25);
+	/// let b = Vector3::new(2.0, 0.5, -1.0);
+	/// let expected = Vector3::new(0.3658648, -0.4337915, 1.101031);
+	/// assert_eq!(expected, a.move_towards(b, 0.2));
+	/// assert_eq!(b, a.move_towards(b, 20.0));
+	/// ```
+	pub fn move_towards(self, target: Vector3, delta: f32) -> Self {
+		let dir = target - self;
+		let sq_magnitude = dir.square_magnitude();
+		if sq_magnitude == 0.0 || (delta >= 0.0 && sq_magnitude <= delta * delta) {
+			return target;
+		}
+		
+		let diff = delta / Math::sqrt(sq_magnitude);
+		
+		return diff * dir + self;
 	}
 	
 	/// Normalizes the vector
@@ -423,45 +540,149 @@ impl Vector3 {
 	pub fn reject(self, rhs: Vector3) -> Self {
 		self - self.project(rhs)
 	}
-}
-
-// Math Functions
-impl Vector3 {
-	/// Linearly interpolates between the this and the other vector
-	/// - **rhs**: The other vector to end from
-	/// - **t**: The ratio value to interpolate between both vectors. Clamped between 0.0 and 1.0
-	/// 
-	/// **Returns**: Returns the interpolated vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector3;
-	/// let a = Vector3::new(0.0, 4.0, -10.0);
-	/// let b = Vector3::new(1.0, 10.0, -4.0);
-	/// let expected = Vector3::new(0.7, 8.2, -5.8);
-	/// assert_eq!(expected, a.lerp(b, 0.7));
-	/// ```
-	pub fn lerp(self, rhs: Vector3, t: f32) -> Self { self.lerp_unclamped(rhs, t.clamp(0.0, 1.0)) }
 	
-	/// Linearly interpolates between the this and the other vector (not clamped)
-	/// - **rhs**: The other vector to end from
-	/// - **t**: The ratio value to interpolate between both vectors
+	/// Reflects this vector using a normal vector
+	/// - **normal**: The normal vector to reflect off of
 	/// 
-	/// **Returns**: Returns the interpolated vector
+	/// **Returns**: Returns the reflected vector
 	/// #### Examples
 	/// ```
 	/// # use mathx::Vector3;
-	/// let a = Vector3::new(0.0, 4.0, -10.0);
-	/// let b = Vector3::new(1.0, 10.0, -4.0);
-	/// let expected = Vector3::new(0.7, 8.2, -5.8);
-	/// assert_eq!(expected, a.lerp_unclamped(b, 0.7));
+	/// let direction = Vector3::new(1.0, 0.0, 1.0);
+	/// let normal = Vector3::new(0.0, 0.0, -1.0);
+	/// let expected = Vector3::new(1.0, 0.0, -1.0);
+	/// assert_eq!(expected, direction.reflect(normal));
+	/// let direction = Vector3::new(0.25, -0.5, 1.25);
+	/// let normal = Vector3::new(1.0, 0.5, -1.0);
+	/// let expected = Vector3::new(2.75, 0.75, -1.25);
+	/// assert_eq!(expected, direction.reflect(normal));
 	/// ```
-	pub fn lerp_unclamped(self, rhs: Vector3, t: f32) -> Self {
+	pub fn reflect(self, normal: Vector3) -> Self {
+		let dot = -2.0 * (self * normal);
+		
+		return dot * normal + self;
+	}
+	
+	/// Scales the vector using another vector, multiplying everything component-wise
+	/// - **rhs**: The other vector to scale with
+	/// 
+	/// **Returns**: Returns the scaled vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector3;
+	/// let a = Vector3::new(0.25, -0.5, 1.25);
+	/// let b = Vector3::new(2.0, 0.5, -1.0);
+	/// let expected = Vector3::new(0.5, -0.25, -1.25);
+	/// assert_eq!(expected, a.scale(b));
+	/// ```
+	pub fn scale(self, rhs: Vector3) -> Self {
 		Vector3::new(
-			Math::lerp_unclamped(self.x, rhs.x, t),
-			Math::lerp_unclamped(self.y, rhs.y, t),
-			Math::lerp_unclamped(self.z, rhs.z, t)
+			self.x * rhs.x,
+			self.y * rhs.y,
+			self.z * rhs.z
 		)
 	}
+	
+	/// Gets the signed angle between the two vectors using an axis in radians
+	/// - **rhs**: The other vector to get the angle from
+	/// - **axis**: The axis vector to determine what direction the angle is going
+	/// 
+	/// **Returns**: Returns the signed angle between the two vectors using an axis in radians
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Vector3,Math,assert_range};
+	/// let a = Vector3::new(0.25, -0.5, 1.25);
+	/// let b = Vector3::new(2.0, 0.5, -1.0);
+	/// let axis = Vector3::new(1.0, -1.0, 0.0);
+	/// assert_range!(-1.89518322157, a.signed_angle_between(b, axis));
+	/// ```
+	pub fn signed_angle_between(self, rhs: Vector3, axis: Vector3) -> f32 {
+		let angle = self.angle_between(rhs);
+		let cross = self.cross(rhs);
+		let sign = Math::sign(axis * cross);
+		
+		return sign * angle;
+	}
+	
+	/// Gets the signed angle between the two vectors using an axis in degrees
+	/// - **rhs**: The other vector to get the angle from
+	/// - **axis**: The axis vector to determine what direction the angle is going
+	/// 
+	/// **Returns**: Returns the signed angle between the two vectors using an axis in degrees
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Vector3,Math,assert_range};
+	/// let a = Vector3::new(0.25, -0.5, 1.25);
+	/// let b = Vector3::new(2.0, 0.5, -1.0);
+	/// let axis = Vector3::new(1.0, -1.0, 0.0);
+	/// assert_range!(-108.586, a.signed_angle_between_deg(b, axis), 0.01);
+	/// ```
+	pub fn signed_angle_between_deg(self, rhs: Vector3, axis: Vector3) -> f32 { Math::rad2deg(self.signed_angle_between(rhs, axis)) }
+	
+	/// Smooths a vector towards a desired goal over time
+	/// - **target**: The position to try to reach
+	/// - **velocity**: The current velocity
+	/// - **smooth_time**: The time (in seconds) it will take to reach the target
+	/// - **max_speed**: The maximum speed of the vector
+	/// - **delta**: The time between frames
+	/// 
+	/// **Returns**: Returns a tuple of a vector that is closer towards the target and the new velocity
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector3;
+	/// let current = Vector3::new(1.0, 2.0, 3.0);
+	/// let target = Vector3::new(14.0, 15.0, 16.0);
+	/// let velocity = Vector3::new(4.0, 5.0, 6.0);
+	/// let time = 8.0;
+	/// let max_speed = 2.3;
+	/// let delta = 0.2;
+	/// let (position, velocity) = Vector3::smooth_damp(
+	/// 	current,
+	/// 	target,
+	/// 	velocity,
+	/// 	time,
+	/// 	max_speed,
+	/// 	delta
+	/// );
+	/// let expected_position = Vector3::new(1.7734365, 2.9636898, 4.156722);
+	/// let expected_velocity = Vector3::new(3.7411351, 4.644839, 5.5768046);
+	/// assert_eq!(expected_position, position);
+	/// assert_eq!(expected_velocity, velocity);
+	/// ```
+	pub fn smooth_damp(self, target: Vector3, velocity: Vector3, smooth_time: f32, max_speed: f32, delta: f32) -> (Self, Self) {
+		let smooth_time = Math::max(0.0001, smooth_time);
+		let inv_smooth_time = 2.0 / smooth_time;
+		let inv_smooth_delta = inv_smooth_time * delta;
+		let cubic = 1.0 / (
+			1.0
+			+ inv_smooth_delta
+			+ 0.47999998927116394 * inv_smooth_delta * inv_smooth_delta
+			+ 0.23499999940395355 * inv_smooth_delta * inv_smooth_delta * inv_smooth_delta
+		);
+		let mut dir = self - target;
+		let smooth_speed = max_speed * smooth_time;
+		let sq_speed = smooth_speed * smooth_speed;
+		let sq_magnitude = dir.square_magnitude();
+		
+		if sq_magnitude > sq_speed {
+			dir *= smooth_speed / Math::sqrt(sq_magnitude);
+		}
+		
+		let temp_target = target;
+		let target = self - dir;
+		let smooth_velocity = (velocity + inv_smooth_time * dir) * delta;
+		let mut velocity = (velocity - inv_smooth_time * smooth_velocity) * cubic;
+		let a = temp_target - self;
+		let result = target + (dir + smooth_velocity) * cubic;
+		let b = result - temp_target;
+		
+		if a * b > 0.0 {
+			velocity = (result - temp_target) / delta;
+		}
+		
+		return (result, velocity);
+	}
+	
 }
 
 // Conversions
