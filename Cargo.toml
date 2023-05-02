@@ -27,6 +27,7 @@ categories = [
 default = []
 no_std = []
 no_vectors = []
+no_quaternions = []
 no_colors = []
 serde = ["dep:serde"]
 
