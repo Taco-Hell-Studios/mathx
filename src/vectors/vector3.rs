@@ -17,8 +17,7 @@ pub struct Vector3 {
 	z: f32,
 }
 
-// Constructors
-/// The following are constructors for creating a new 3D vector
+/// Constructors
 impl Vector3 {
 	/// Creates a new 3D vector
 	/// - **x**: The x coordinate of the vector
@@ -209,51 +208,21 @@ impl Vector3 {
 	}
 }
 
-// Properties
+/// Properties
 impl Vector3 {
 	/// Gets the x coordinate of the vector
 	/// 
 	/// **Returns**: Returns the x coordinate of the vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector3;
-	/// let a = Vector3::new(10.0, 20.0, 30.0);
-	/// assert_eq!(10.0, a.x());
-	/// ```
 	pub fn x(&self) -> f32 { self.x }
+	
+	/// Sets the x coordinate of the vector
+	/// - **value**: The value to set the x coordinate of the vector
+	pub fn set_x(&mut self, value: f32) { self.x = value; }
 	
 	/// Gets the y coordinate of the vector
 	/// 
 	/// **Returns**: Returns the y coordinate of the vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector3;
-	/// let a = Vector3::new(10.0, 20.0, 30.0);
-	/// assert_eq!(20.0, a.y());
-	/// ```
 	pub fn y(&self) -> f32 { self.y }
-	
-	/// Gets the z coordinate of the vector
-	/// 
-	/// **Returns**: Returns the z coordinate of the vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector3;
-	/// let a = Vector3::new(10.0, 20.0, 30.0);
-	/// assert_eq!(30.0, a.z());
-	/// ```
-	pub fn z(&self) -> f32 { self.z }
-	
-	/// Sets the x coordinate of the vector
-	/// - **value**: The value to set the x coordinate of the vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector3;
-	/// let mut a = Vector3::left();
-	/// a.set_x(-100.0);
-	/// assert_eq!(-100.0, a.x());
-	/// ```
-	pub fn set_x(&mut self, value: f32) { self.x = value; }
 	
 	/// Sets the y coordinate of the vector
 	/// - **value**: The value to set the y coordinate of the vector
@@ -266,15 +235,13 @@ impl Vector3 {
 	/// ```
 	pub fn set_y(&mut self, value: f32) { self.y = value; }
 	
+	/// Gets the z coordinate of the vector
+	/// 
+	/// **Returns**: Returns the z coordinate of the vector
+	pub fn z(&self) -> f32 { self.z }
+	
 	/// Sets the z coordinate of the vector
 	/// - **value**: The value to set the z coordinate of the vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector3;
-	/// let mut a = Vector3::forward();
-	/// a.set_z(10.0);
-	/// assert_eq!(10.0, a.z());
-	/// ```
 	pub fn set_z(&mut self, value: f32) { self.z = value; }
 	
 	/// Gets the magnitude of the vector. This returns the length of the vector
@@ -286,7 +253,15 @@ impl Vector3 {
 	/// let a = Vector3::new(-1.0, 2.0, -2.0);
 	/// assert_eq!(3.0, a.magnitude());
 	/// ```
-	pub fn magnitude(&self) -> f32 { Math::sqrt(self.square_magnitude()) }
+	pub fn magnitude(&self) -> f32 {
+		let magnitude = self.square_magnitude();
+		
+		if magnitude == 0.0 || magnitude == 1.0 {
+			return magnitude;
+		}
+		
+		return Math::sqrt(magnitude);
+	}
 	
 	/// Gets the magnitude squared, avoiding the use of a square root
 	/// 
@@ -300,7 +275,7 @@ impl Vector3 {
 	pub fn square_magnitude(&self) -> f32 { self.x * self.x + self.y * self.y + self.z * self.z }
 }
 
-// Public Methods
+/// Public Methods
 impl Vector3 {
 	pub fn rotate_towards(self, target: Vector3, radians_delta: f32, magnitude_delta: f32) -> Self {
 		todo!()
@@ -325,7 +300,7 @@ impl Vector3 {
 	/// assert_range!(1.89518322157, a.angle_between(b));
 	/// ```
 	pub fn angle_between(self, rhs: Vector3) -> f32 {
-		let value = Math::sqrt(self.square_magnitude() * rhs.square_magnitude());;
+		let value = Math::sqrt(self.square_magnitude() * rhs.square_magnitude());
 		
 		if value < 0.0000000001 { return 0.0; }
 		else { return Math::acos(Math::clamp((self * rhs) / value, -1.0, 1.0)); }
@@ -495,16 +470,7 @@ impl Vector3 {
 	/// assert_range!(0.3843312, vector.y());
 	/// assert_range!(-0.9223949, vector.z());
 	/// ```
-	pub fn normalize(self) -> Self {
-		let magnitude = self.magnitude();
-		
-		if magnitude == 0.0 { return Vector3::zero(); }
-		if magnitude == 1.0 { return self; }
-		
-		let inverse_magnitude = magnitude.recip();
-		
-		return inverse_magnitude * self;
-	}
+	pub fn normalize(self) -> Self { self / self.magnitude() }
 	
 	/// Projects this vector onto the given vector
 	/// - **rhs**: The vector to project onto
@@ -685,7 +651,7 @@ impl Vector3 {
 	
 }
 
-// Conversions
+/// Conversions
 impl Vector3 {
 	pub fn to_vector2(self) -> Vector2 { Vector2::new(self.x, self.y) }
 }

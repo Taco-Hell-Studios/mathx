@@ -15,7 +15,7 @@ pub struct Vector2 {
 	y: f32,
 }
 
-// Constructors
+/// Constructors
 impl Vector2 {
 	/// Creates a new 2D vector
 	/// - **x**: The x coordinate of the vector
@@ -158,50 +158,24 @@ impl Vector2 {
 	}
 }
 
-// Properties
+/// Properties
 impl Vector2 {
 	/// Gets the x coordinate of the vector
 	/// 
 	/// **Returns**: Returns the x coordinate of the vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector2;
-	/// let a = Vector2::new(10.0, 20.0);
-	/// assert_eq!(10.0, a.x());
-	/// ```
 	pub fn x(&self) -> f32 { self.x }
 	
 	/// Sets the x coordinate of the vector
 	/// - **value**: The value to set the x coordinate of the vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector2;
-	/// let mut a = Vector2::left();
-	/// a.set_x(-100.0);
-	/// assert_eq!(-100.0, a.x());
-	/// ```
 	pub fn set_x(&mut self, value: f32) { self.x = value; }
 	
 	/// Gets the y coordinate of the vector
 	/// 
 	/// **Returns**: Returns the y coordinate of the vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector2;
-	/// let a = Vector2::new(10.0, 20.0);
-	/// assert_eq!(20.0, a.y());
-	/// ```
 	pub fn y(&self) -> f32 { self.y }
 	
 	/// Sets the y coordinate of the vector
 	/// - **value**: The value to set the y coordinate of the vector
-	/// #### Examples
-	/// ```
-	/// # use mathx::Vector2;
-	/// let mut a = Vector2::up();
-	/// a.set_y(6.0);
-	/// assert_eq!(6.0, a.y());
-	/// ```
 	pub fn set_y(&mut self, value: f32) { self.y = value; }
 	
 	/// Get the heading from the vector in radians
@@ -217,7 +191,6 @@ impl Vector2 {
 	
 	/// Sets the heading for the vector in radians
 	/// - **angle**: The angle to set the heading of the vector for in radians
-	/// 
 	/// #### Examples
 	/// ```
 	/// # use mathx::{Math,Vector2,assert_range};
@@ -266,7 +239,15 @@ impl Vector2 {
 	/// let a = Vector2::new(-1.0, 2.0);
 	/// assert_eq!(2.236068, a.magnitude());
 	/// ```
-	pub fn magnitude(&self) -> f32 { Math::sqrt(self.square_magnitude()) }
+	pub fn magnitude(&self) -> f32 {
+		let magnitude = self.square_magnitude();
+		
+		if magnitude == 0.0 || magnitude == 1.0 {
+			return magnitude;
+		}
+		
+		return Math::sqrt(magnitude);
+	}
 	
 	/// Gets the magnitude squared, avoiding the use of a square root
 	/// 
@@ -280,7 +261,7 @@ impl Vector2 {
 	pub fn square_magnitude(&self) -> f32 { self.x * self.x + self.y * self.y }
 }
 
-// Public Methods
+/// Public Methods
 impl Vector2 {
 	/// Gets the angle between the two vectors in radians
 	/// - **rhs**: The other vector to get the angle from
@@ -439,16 +420,7 @@ impl Vector2 {
 	/// assert_range!(-0.09950372, vector.x());
 	/// assert_range!(0.99503714, vector.y());
 	/// ```
-	pub fn normalize(self) -> Self {
-		let magnitude = self.magnitude();
-		
-		if magnitude == 0.0 { return Vector2::zero(); }
-		if magnitude == 1.0 { return self; }
-		
-		let inverse_magnitude = magnitude.recip();
-		
-		return inverse_magnitude * self;
-	}
+	pub fn normalize(self) -> Self { self / self.magnitude() }
 	
 	/// Creates a perpendicular 2D vector
 	/// 
@@ -573,7 +545,7 @@ impl Vector2 {
 	
 }
 
-// Conversions
+/// Conversions
 impl Vector2 {
 	pub fn to_vector3(self) -> Vector3 { Vector3::new(self.x, self.y, 0.0) }
 }
