@@ -277,17 +277,6 @@ impl Vector3 {
 
 /// Public Methods
 impl Vector3 {
-	pub fn rotate_towards(self, target: Vector3, radians_delta: f32, magnitude_delta: f32) -> Self {
-		todo!()
-	}
-	pub fn slerp(self, rhs: Vector3, t: f32) -> Self {
-		todo!()
-	}
-	pub fn slerp_unclamped(self, rhs: Vector3, t: f32) -> Self {
-		todo!()
-	}
-	
-	
 	/// Gets the angle between the two vectors in radians
 	/// - **rhs**: The other vector to get the angle from
 	/// 
@@ -529,6 +518,51 @@ impl Vector3 {
 		return dot * normal + self;
 	}
 	
+	/// Rotates the vector around towards the target vector
+	/// - **target**: The target vector to rotate towards
+	/// - **radians_delta**: The maximum angle delta the vector will rotate in radians
+	/// - **magnitude_delta**: The maximum magnitude the vector will rotate with
+	/// 
+	/// **Returns**: Returns the rotated vector
+	/// #### Remarks
+	/// This method uses quaternions to rotate the vector, and does not appear if using the `no_quaternions` feature
+	/// #### Examples
+	/// ```
+	/// # use mathx::Vector3;
+	/// let a = Vector3::new(1.0, 3.0, 4.0);
+	/// let b = Vector3::new(4.0, 6.0, 7.0);
+	/// let expected = Vector3::new(1.504205, 3.097963, 3.894842);
+	/// let actual = Vector3::rotate_towards(a, b, 0.1, 0.1);
+	/// assert_eq!(expected, actual);
+	/// ```
+	#[cfg(not(feature = "no_quaternions"))]
+	pub fn rotate_towards(self, target: Vector3, radians_delta: f32, magnitude_delta: f32) -> Self {
+		use crate::Quaternion;
+		
+		let axis = self.cross(target);
+		let abs_radians = Math::abs(radians_delta);
+		let angle = Math::clamp(self.signed_angle_between(target, axis), -abs_radians, abs_radians);
+		
+		if angle == 0.0 { return target; }
+		
+		let rotation = Quaternion::from_axis_angle(axis, angle);
+		let rotated = rotation * self;
+		let magnitude = self.magnitude();
+		let target_magnitude = target.magnitude();
+		
+		let towards_magnitude = if magnitude < target_magnitude {
+			Math::min(self.magnitude() + magnitude_delta, target_magnitude)
+		}
+		else if magnitude > target_magnitude {
+			Math::max(self.magnitude() - magnitude_delta, target_magnitude)
+		}
+		else {
+			return rotated;
+		};
+		
+		return rotated.normalize() * towards_magnitude;
+	}
+	
 	/// Scales the vector using another vector, multiplying everything component-wise
 	/// - **rhs**: The other vector to scale with
 	/// 
@@ -584,6 +618,62 @@ impl Vector3 {
 	/// assert_range!(-108.586, a.signed_angle_between_deg(b, axis), 0.01);
 	/// ```
 	pub fn signed_angle_between_deg(self, rhs: Vector3, axis: Vector3) -> f32 { Math::rad2deg(self.signed_angle_between(rhs, axis)) }
+	
+	/// Spherically interpolates between two vectors
+	/// - **rhs**: The target vector to interpolate towards
+	/// - **t**: The ratio (t) to interpolate with
+	/// 
+	/// **Returns**: Returns the spherically interpolated vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Vector3,Math,assert_range};
+	/// let a = Vector3::new(1.0, 3.0, 4.0);
+	/// let b = Vector3::new(4.0, 6.0, 7.0);
+	/// let actual = Vector3::slerp_unclamped(a, b, 0.7);
+	/// let expected = Vector3::new(2.903773, 5.117129, 6.223807);
+	/// assert_range!(expected.x(), actual.x(), 0.0001);
+	/// assert_range!(expected.y(), actual.y(), 0.0001);
+	/// assert_range!(expected.z(), actual.z(), 0.0001);
+	/// ```
+	pub fn slerp(self, rhs: Vector3, t: f32) -> Self { self.slerp_unclamped(rhs, Math::clamp(t, 0.0, 1.0)) }
+	
+	/// Spherically interpolates between two vectors (not clamped)
+	/// - **rhs**: The target vector to interpolate towards
+	/// - **t**: The ratio (t) to interpolate with (not clamped)
+	/// 
+	/// **Returns**: Returns the spherically interpolated vector
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Vector3,Math,assert_range};
+	/// let a = Vector3::new(1.0, 3.0, 4.0);
+	/// let b = Vector3::new(4.0, 6.0, 7.0);
+	/// let actual = Vector3::slerp_unclamped(a, b, 0.7);
+	/// let expected = Vector3::new(2.903773, 5.117129, 6.223807);
+	/// assert_range!(expected.x(), actual.x(), 0.0001);
+	/// assert_range!(expected.y(), actual.y(), 0.0001);
+	/// assert_range!(expected.z(), actual.z(), 0.0001);
+	/// ```
+	pub fn slerp_unclamped(self, rhs: Vector3, t: f32) -> Self {
+		let size = Math::lerp_unclamped(self.magnitude(), rhs.magnitude(), t);
+		let unit_self = self.normalize();
+		let mut unit_rhs = rhs.normalize();
+		let mut dot = unit_self.dot(unit_rhs);
+		
+		if dot < 0.0 {
+			unit_rhs = -unit_rhs;
+			dot = -dot;
+		}
+		if dot > 0.9995 {
+			return size * (unit_self + t * (unit_rhs - unit_self)).normalize();
+		}
+		
+		let angle = t * Math::acos(dot);
+		let unit = dot * unit_self;
+		let unit_rhs = (unit_rhs - unit).normalize();
+		let (sin, cos) = Math::sin_cos(angle);
+		
+		return size * cos * unit_self + size * sin * unit_rhs;
+	}
 	
 	/// Smooths a vector towards a desired goal over time
 	/// - **target**: The position to try to reach
@@ -648,7 +738,6 @@ impl Vector3 {
 		
 		return (result, velocity);
 	}
-	
 }
 
 /// Conversions
