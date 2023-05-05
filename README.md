@@ -3,6 +3,10 @@
 
 A mathematics library that is compatible with `no_std`, to be used with embedded systems. Giving back some functionality lost when removing the standard library.
 
+Structures that are fully usable and stable:
+- Math (Used for `no_std` to compensate for missing features)
+- Vectors (`Vector2`, `Vector3`)
+
 Full Documentation: https://docs.rs/mathx
 
 **Note**: This library is still a work in progress.
