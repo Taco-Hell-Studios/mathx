@@ -1,6 +1,9 @@
 
 # Mathx
 
+[![Build](https://github.com/Taco-Hell-Studios/mathx/actions/workflows/rust.yml/badge.svg)](https://github.com/Taco-Hell-Studios/mathx/actions/workflows/rust.yml)
+[![Latest Version](https://img.shields.io/crates/v/mathx.svg)](https://crates.io/crates/mathx)
+
 A mathematics library that is compatible with `no_std`, to be used with embedded systems. Giving back some functionality lost when removing the standard library.
 
 Structures that are fully usable and stable:

@@ -1,6 +1,6 @@
 [package]
 name = "mathx"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 license-file = "LICENSE"
 authors = ["Paul Casanova <pgonzbecer@gmail.com>"]
@@ -28,6 +28,7 @@ default = []
 no_std = []
 no_vectors = []
 no_quaternions = []
+no_rays = []
 no_colors = []
 serde = ["dep:serde"]
 
