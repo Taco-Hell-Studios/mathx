@@ -4,10 +4,15 @@
 mod math;
 pub use math::Math;
 
-#[cfg(not(feature = "no_vectors"))]
+#[cfg(not(all(feature = "no_vectors", feature = "no_quaternions")))]
 mod arithmetic;
-#[cfg(not(feature = "no_vectors"))]
+#[cfg(not(all(feature = "no_vectors", feature = "no_quaternions")))]
 pub(crate) use arithmetic::*;
+
+#[cfg(not(feature = "no_quaternions"))]
+mod quaternions;
+#[cfg(not(feature = "no_quaternions"))]
+pub use quaternions::Quaternion;
 
 #[cfg(not(feature = "no_vectors"))]
 mod vectors;

@@ -100,6 +100,16 @@ pub(crate) use impl_sub;
 
 #[doc(hidden)]
 macro_rules! impl_mul {
+	($($v1:ty, $v2:ty => $out:ty: $fn:ident)*) => {
+		$(
+			impl Mul<$v2> for $v1 {
+				type Output = $out;
+				fn mul(self, rhs:$v2) -> Self::Output {
+					self.$fn(rhs)
+				}
+			}
+		)*
+	};
 	($($t:ty)*) => {
 		$(
 			impl Mul<f32> for $t {
@@ -143,6 +153,16 @@ pub(crate) use impl_mul;
 
 #[doc(hidden)]
 macro_rules! impl_div {
+	($($v1:ty, $v2:ty => $out:ty: $fn:ident)*) => {
+		$(
+			impl Div<$v2> for $v1 {
+				type Output = $out;
+				fn div(self, rhs:$v2) -> Self::Output {
+					self.$fn(rhs)
+				}
+			}
+		)*
+	};
 	($($t:ty)*) => {
 		$(
 			impl Div<f32> for $t {

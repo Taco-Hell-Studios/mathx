@@ -15,7 +15,7 @@ pub struct Color {
 	a: f32,
 }
 
-// Constructors
+/// Constructors
 impl Color {
 	/// Creates a new color using rgb with floating point numbers
 	/// - **r**: The red channel to set
@@ -139,7 +139,7 @@ impl Color {
 	}
 }
 
-// Properties
+/// Properties
 impl Color {
 	/// Gets the red channel for the color
 	/// 
@@ -152,83 +152,6 @@ impl Color {
 	/// ```
 	pub fn red(&self) -> f32 { self.r }
 	
-	/// Gets the red channel for the color
-	/// 
-	/// **Returns**: Returns the red channel as a byte
-	/// #### Examples
-	/// ```
-	/// # use mathx::Color;
-	/// let color = Color::new(0.345, 1.0, 1.0);
-	/// assert_eq!(87, color.red_as_byte());
-	/// ```
-	pub fn red_as_byte(&self) -> u8 { (self.r * 255.0) as u8 }
-	
-	/// Gets the green channel for the color
-	/// 
-	/// **Returns**: Returns the green channel as a floating point number between 0.0 and 1.0
-	/// #### Examples
-	/// ```
-	/// # use mathx::Color;
-	/// let color = Color::new(0.1, 0.9, 0.1);
-	/// assert_eq!(0.9, color.green());
-	/// ```
-	pub fn green(&self) -> f32 { self.g }
-	
-	/// Gets the green channel for the color
-	/// 
-	/// **Returns**: Returns the green channel as a byte
-	/// #### Examples
-	/// ```
-	/// # use mathx::Color;
-	/// let color = Color::new(0.1, 0.9, 0.1);
-	/// assert_eq!(229, color.green_as_byte());
-	/// ```
-	pub fn green_as_byte(&self) -> u8 { (self.g * 255.0) as u8 }
-	
-	/// Gets the blue channel for the color
-	/// 
-	/// **Returns**: Returns the blue channel as a floating point number between 0.0 and 1.0
-	/// #### Examples
-	/// ```
-	/// # use mathx::Color;
-	/// let color = Color::new(0.1, 0.9, 0.1);
-	/// assert_eq!(0.1, color.blue());
-	/// ```
-	pub fn blue(&self) -> f32 { self.b }
-	
-	/// Gets the blue channel for the color
-	/// 
-	/// **Returns**: Returns the blue channel as a byte
-	/// #### Examples
-	/// ```
-	/// # use mathx::Color;
-	/// let color = Color::new(0.1, 0.9, 0.1);
-	/// assert_eq!(25, color.blue_as_byte());
-	/// ```
-	pub fn blue_as_byte(&self) -> u8 { (self.b * 255.0) as u8 }
-	
-	/// Gets the alpha channel for the color
-	/// 
-	/// **Returns**: Returns the alpha channel as a floating point number between 0.0 and 1.0
-	/// #### Examples
-	/// ```
-	/// # use mathx::Color;
-	/// let color = Color::new_alpha(1.0, 1.0, 1.0, 0.4);
-	/// assert_eq!(0.4, color.alpha());
-	/// ```
-	pub fn alpha(&self) -> f32 { self.a }
-	
-	/// Gets the alpha channel for the color
-	/// 
-	/// **Returns**: Returns the alpha channel as a byte
-	/// #### Examples
-	/// ```
-	/// # use mathx::Color;
-	/// let color = Color::new_alpha(1.0, 1.0, 1.0, 0.4);
-	/// assert_eq!(102, color.alpha_as_byte());
-	/// ```
-	pub fn alpha_as_byte(&self) -> u8 { (self.a * 255.0) as u8 }
-	
 	/// Sets the red channel for the color
 	/// - **value**: The value to set the red channel to
 	/// #### Examples
@@ -239,6 +162,17 @@ impl Color {
 	/// assert_eq!(0.1, color.red());
 	/// ```
 	pub fn set_red(&mut self, value: f32) { self.r = Math::clamp(value, 0.0, 1.0); }
+	
+	/// Gets the red channel for the color
+	/// 
+	/// **Returns**: Returns the red channel as a byte
+	/// #### Examples
+	/// ```
+	/// # use mathx::Color;
+	/// let color = Color::new(0.345, 1.0, 1.0);
+	/// assert_eq!(87, color.red_as_byte());
+	/// ```
+	pub fn red_as_byte(&self) -> u8 { (self.r * 255.0) as u8 }
 	
 	/// Sets the red channel for the color with a byte
 	/// - **value**: The value to set the red channel to
@@ -251,6 +185,17 @@ impl Color {
 	/// ```
 	pub fn set_red_as_byte(&mut self, value: u8) { self.r = value as f32 / 255.0 }
 	
+	/// Gets the green channel for the color
+	/// 
+	/// **Returns**: Returns the green channel as a floating point number between 0.0 and 1.0
+	/// #### Examples
+	/// ```
+	/// # use mathx::Color;
+	/// let color = Color::new(0.1, 0.9, 0.1);
+	/// assert_eq!(0.9, color.green());
+	/// ```
+	pub fn green(&self) -> f32 { self.g }
+	
 	/// Sets the green channel for the color
 	/// - **value**: The value to set the green channel to
 	/// #### Examples
@@ -261,6 +206,17 @@ impl Color {
 	/// assert_eq!(0.2, color.green());
 	/// ```
 	pub fn set_green(&mut self, value: f32) { self.g = Math::clamp(value, 0.0, 1.0); }
+	
+	/// Gets the green channel for the color
+	/// 
+	/// **Returns**: Returns the green channel as a byte
+	/// #### Examples
+	/// ```
+	/// # use mathx::Color;
+	/// let color = Color::new(0.1, 0.9, 0.1);
+	/// assert_eq!(229, color.green_as_byte());
+	/// ```
+	pub fn green_as_byte(&self) -> u8 { (self.g * 255.0) as u8 }
 	
 	/// Sets the green channel for the color using a byte
 	/// - **value**: The value to set the green channel to
@@ -273,6 +229,17 @@ impl Color {
 	/// ```
 	pub fn set_green_as_byte(&mut self, value: u8) { self.g = value as f32 / 255.0 }
 	
+	/// Gets the blue channel for the color
+	/// 
+	/// **Returns**: Returns the blue channel as a floating point number between 0.0 and 1.0
+	/// #### Examples
+	/// ```
+	/// # use mathx::Color;
+	/// let color = Color::new(0.1, 0.9, 0.1);
+	/// assert_eq!(0.1, color.blue());
+	/// ```
+	pub fn blue(&self) -> f32 { self.b }
+	
 	/// Sets the blue channel for the color
 	/// - **value**: The value to set the blue channel to
 	/// #### Examples
@@ -283,6 +250,17 @@ impl Color {
 	/// assert_eq!(0.3, color.blue());
 	/// ```
 	pub fn set_blue(&mut self, value: f32) { self.b = Math::clamp(value, 0.0, 1.0); }
+	
+	/// Gets the blue channel for the color
+	/// 
+	/// **Returns**: Returns the blue channel as a byte
+	/// #### Examples
+	/// ```
+	/// # use mathx::Color;
+	/// let color = Color::new(0.1, 0.9, 0.1);
+	/// assert_eq!(25, color.blue_as_byte());
+	/// ```
+	pub fn blue_as_byte(&self) -> u8 { (self.b * 255.0) as u8 }
 	
 	/// Sets the blue channel for the color using a byte
 	/// - **value**: The value to set the blue channel to
@@ -295,6 +273,17 @@ impl Color {
 	/// ```
 	pub fn set_blue_as_byte(&mut self, value: u8) { self.b = value as f32 / 255.0 }
 	
+	/// Gets the alpha channel for the color
+	/// 
+	/// **Returns**: Returns the alpha channel as a floating point number between 0.0 and 1.0
+	/// #### Examples
+	/// ```
+	/// # use mathx::Color;
+	/// let color = Color::new_alpha(1.0, 1.0, 1.0, 0.4);
+	/// assert_eq!(0.4, color.alpha());
+	/// ```
+	pub fn alpha(&self) -> f32 { self.a }
+	
 	/// Sets the alpha channel for the color
 	/// - **value**: The value to set the alpha channel to
 	/// #### Examples
@@ -305,6 +294,17 @@ impl Color {
 	/// assert_eq!(0.4, color.alpha());
 	/// ```
 	pub fn set_alpha(&mut self, value: f32) { self.a = Math::clamp(value, 0.0, 1.0); }
+	
+	/// Gets the alpha channel for the color
+	/// 
+	/// **Returns**: Returns the alpha channel as a byte
+	/// #### Examples
+	/// ```
+	/// # use mathx::Color;
+	/// let color = Color::new_alpha(1.0, 1.0, 1.0, 0.4);
+	/// assert_eq!(102, color.alpha_as_byte());
+	/// ```
+	pub fn alpha_as_byte(&self) -> u8 { (self.a * 255.0) as u8 }
 	
 	/// Sets the alpha channel for the color using a byte
 	/// - **value**: The value to set the alpha channel to
