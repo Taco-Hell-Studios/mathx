@@ -7,6 +7,7 @@ Structures that are fully usable and stable:
 - Math (Used for `no_std` to compensate for missing features)
 - Vectors (`Vector2`, `Vector3`)
 - Quaternions (`Quaternion`)
+- Rays (`Ray2`, `Ray3`)
 
 Full Documentation: https://docs.rs/mathx
 
