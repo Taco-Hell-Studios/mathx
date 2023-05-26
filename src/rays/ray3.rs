@@ -1,6 +1,7 @@
 
 use core::ops::{Neg, Mul, MulAssign, Div, DivAssign};
 
+use crate::Ray2;
 use crate::Vector3;
 use crate::{MulDivScalar, impl_mul, impl_div};
 
@@ -37,27 +38,106 @@ impl Ray3 {
 	/// 
 	/// **Returns**: Returns the origin of the ray
 	/// #### Examples
-	/// 
+	/// ```
+	/// # use mathx::{Ray3,Vector3};
+	/// let ray = Ray3::new(Vector3::one(), Vector3::forward());
+	/// assert_eq!(Vector3::one(), ray.origin());
+	/// ```
 	pub fn origin(&self) -> Vector3 { self.origin }
+	
+	/// Sets the origin of the ray
+	/// - **value**: The value to set the origin to
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Ray3,Vector3};
+	/// let mut ray = Ray3::new(Vector3::one(), Vector3::forward());
+	/// ray.set_origin(Vector3::forward());
+	/// assert_eq!(Vector3::forward(), ray.origin());
+	/// ```
 	pub fn set_origin(&mut self, value: Vector3) { self.origin = value; }
+	
+	/// Gets the direction of the ray as a 3D vector
+	/// 
+	/// **Returns**: Returns the direction of the ray
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Ray3,Vector3};
+	/// let ray = Ray3::new(Vector3::one(), Vector3::forward());
+	/// assert_eq!(Vector3::forward(), ray.direction());
+	/// ```
 	pub fn direction(&self) -> Vector3 { self.direction }
+	
+	/// Sets the direction of the ray
+	/// - **value**: The value to set the direction to
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Ray3,Vector3};
+	/// let mut ray = Ray3::new(Vector3::one(), Vector3::forward());
+	/// 
+	/// ray.set_direction(Vector3::one());
+	/// assert_eq!(Vector3::one(), ray.direction());
+	/// ```
 	pub fn set_direction(&mut self, value: Vector3) { self.direction = value; }
 }
 
 /// Public Methods
 impl Ray3 {
+	/// Gets the point on the ray from the given distance
+	/// - **distance**: The distance from the ray to get the point from
+	/// 
+	/// **Returns**: Returns a 3D point from the given distance from the ray
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Ray3, Vector3};
+	/// let ray = Ray3::new(Vector3::one(), Vector3::forward());
+	/// let point = ray.get_point(4.3);
+	/// assert_eq!(Vector3::new(1.0, 1.0, 5.3), point);
+	/// ```
 	pub fn get_point(self, distance: f32) -> Vector3 {
 		let dir = self.direction * distance;
 		
 		return self.origin + dir;
 	}
+	
+	/// Gets the closest point on the ray from the given point
+	/// - **point**: The point to get the closest point from
+	/// 
+	/// **Returns**: Returns the closest point from the given point
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Ray3, Vector3};
+	/// let ray = Ray3::new(Vector3::one(), Vector3::forward());
+	/// let point = ray.closest_point(Vector3::down());
+	/// assert_eq!(Vector3::new(1.0, 1.0, 0.0), point);
+	/// ```
 	pub fn closest_point(self, point: Vector3) -> Vector3 {
 		let diff = point - self.origin;
 		let projected = diff.project(self.direction);
 		
 		return projected + self.origin;
 	}
+	
+	/// Gets the distance between the point and the ray's line
+	/// - **point**: The point to check the distance from
+	/// 
+	/// **Returns**: Returns the distance between the point and the ray's line
+	/// #### Examples
+	/// ```
+	/// # use mathx::{Ray3, Vector3};
+	/// let ray = Ray3::new(Vector3::forward(), Vector3::forward());
+	/// let distance = ray.distance(Vector3::down());
+	/// assert_eq!(1.0, distance);
+	/// let ray = Ray3::new(Vector3::one(), Vector3::forward());
+	/// let distance = ray.distance(Vector3::down());
+	/// assert_eq!(2.236068, distance);
+	/// ```
 	pub fn distance(self, point: Vector3) -> f32 { point.distance(self.closest_point(point)) }
+}
+
+impl From<Ray2> for Ray3 {
+	fn from(value: Ray2) -> Self {
+		Ray3::new(value.origin().to_vector3(), value.direction().to_vector3())
+	}
 }
 
 unsafe impl Send for Ray3 {}

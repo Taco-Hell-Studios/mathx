@@ -22,7 +22,7 @@ pub use vectors::{Vector3, Vector2};
 #[cfg(not(all(feature = "no_rays", feature = "no_vectors")))]
 mod rays;
 #[cfg(not(all(feature = "no_rays", feature = "no_vectors")))]
-pub use rays::Ray3;
+pub use rays::{Ray2, Ray3};
 
 #[cfg(not(feature = "no_colors"))]
 mod colors;
