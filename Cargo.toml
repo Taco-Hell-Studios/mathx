@@ -1,6 +1,6 @@
 [package]
 name = "mathx"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 license-file = "LICENSE"
 authors = ["Paul Casanova <pgonzbecer@gmail.com>"]
@@ -30,6 +30,7 @@ no_vectors = []
 no_quaternions = []
 no_rays = []
 no_colors = []
+no_planes = []
 serde = ["dep:serde"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
