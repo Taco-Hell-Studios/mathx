@@ -3,6 +3,7 @@
 
 mod math;
 pub use math::Math;
+pub mod interfaces;
 
 #[cfg(not(all(feature = "no_vectors", feature = "no_quaternions")))]
 mod arithmetic;
@@ -23,6 +24,14 @@ pub use vectors::{Vector3, Vector2};
 mod rays;
 #[cfg(not(all(feature = "no_rays", feature = "no_vectors")))]
 pub use rays::{Ray2, Ray3};
+
+#[cfg(not(all(feature = "no_planes", feature = "no_vectors")))]
+mod plane;
+#[cfg(not(all(feature = "no_planes", feature = "no_vectors")))]
+pub use plane::Plane;
+
+#[cfg(not(feature = "no_collision"))]
+pub mod collision;
 
 #[cfg(not(feature = "no_colors"))]
 mod colors;

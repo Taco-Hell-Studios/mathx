@@ -1714,6 +1714,7 @@ impl Math {
 
 #[doc(hidden)]
 #[macro_export]
+#[cfg(test)]
 macro_rules! assert_range {
 	($expected:expr, $value:expr) => {
 		assert_range!($expected, $value, 0.0001);
@@ -1725,6 +1726,7 @@ macro_rules! assert_range {
 
 #[doc(hidden)]
 #[macro_export]
+#[cfg(test)]
 macro_rules! assert_range_tuple2 {
 	($expected:expr, $value:expr, $epsilon:expr) => {
 		if !Math::approx_epsilon($expected.0, $value.0, $epsilon) || !Math::approx_epsilon($expected.1, $value.1,  $epsilon) { panic!("\n\nleft: {:?}\nright: {:?}\n\n", $expected, $value); }
