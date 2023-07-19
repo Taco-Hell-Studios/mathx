@@ -37,3 +37,6 @@ pub mod collision;
 mod colors;
 #[cfg(not(feature = "no_colors"))]
 pub use colors::Color;
+
+#[cfg(not(feature = "no_tweens"))]
+pub mod curves;
